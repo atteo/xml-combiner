@@ -467,6 +467,30 @@ public class XmlCombinerTest {
 		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
 	}
 
+	@Test
+	public void shouldWorkWithCustomIdAttribute2() throws IOException, SAXException, ParserConfigurationException,
+			TransformerException {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <nested>\n"
+				+ "        <service name='a'>\n"
+				+ "            <parameter>old value2</parameter>\n"
+				+ "        </service>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <nested>\n"
+				+ "        <service name='a'>\n"
+				+ "            <parameter>new value</parameter>\n"
+				+ "        </service>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String result = dominant;
+
+		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
+	}
+
 	private static String combine(String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {

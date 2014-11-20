@@ -34,17 +34,16 @@ import com.google.common.collect.ListMultimap;
 class Context {
 	private final List<Node> neighbours = new ArrayList<>();
 	private Element element;
-	private String idAttributeName;
+	private final String idAttributeName;
 
-	public static Context fromElement(Element element, String idAttributeName) {
-		Context context = new Context();
-		context.setElement(element);
-		context.setIdAttributeName(idAttributeName);
-		return context;
+	public Context(String idAttributeName) {
+		this.idAttributeName = idAttributeName;
 	}
 
-	private void setIdAttributeName(String idAttributeName) {
-		this.idAttributeName = idAttributeName;
+	public static Context fromElement(Element element, String idAttributeName) {
+		Context context = new Context(idAttributeName);
+		context.setElement(element);
+		return context;
 	}
 
 	public void addNeighbour(Node node) {
@@ -86,13 +85,13 @@ class Context {
 		NodeList nodes = element.getChildNodes();
 		List<Context> contexts = new ArrayList<>(nodes.getLength());
 
-		Context context = new Context();
+		Context context = new Context(idAttributeName);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			if (node instanceof Element) {
 				context.setElement((Element) node);
 				contexts.add(context);
-				context = new Context();
+				context = new Context(idAttributeName);
 			} else {
 				context.addNeighbour(node);
 			}

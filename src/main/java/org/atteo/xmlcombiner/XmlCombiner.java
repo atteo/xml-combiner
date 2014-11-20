@@ -216,7 +216,7 @@ public class XmlCombiner {
 			}
 		}
 
-		Context result = new Context();
+		Context result = new Context(idAttributeName);
 		result.setElement(resultElement);
 		appendNeighbours(dominant, result);
 
@@ -229,7 +229,7 @@ public class XmlCombiner {
 	 * @return copied element in current document
 	 */
 	private Context copyRecursively(Context context) {
-		Context copy = new Context();
+		Context copy = new Context(idAttributeName);
 
 		appendNeighbours(context, copy);
 
@@ -242,7 +242,7 @@ public class XmlCombiner {
 	}
 
 	/**
-	 * Append neighbours from source to destination
+	 * Append neighbors from source to destination
 	 * @param source source element, it is assumed it is from unrelated document
 	 * @param destination destination element
 	 */
