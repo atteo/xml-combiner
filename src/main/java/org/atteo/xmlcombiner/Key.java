@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.atteo.config.xmlmerge;
+package org.atteo.xmlcombiner;
 
 /**
  * Element name and the value of it's 'id' attribute if exists.
