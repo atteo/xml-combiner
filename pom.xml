@@ -8,6 +8,7 @@
 	</parent>
 	<artifactId>xml-combiner</artifactId>
 	<name>Atteo XML combiner</name>
+	<version>1-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>
