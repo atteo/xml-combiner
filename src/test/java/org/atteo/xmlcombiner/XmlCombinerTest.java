@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -436,7 +437,7 @@ public class XmlCombinerTest {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service name='a'>\n"
-				+ "        <parameter>old value</parameter>\n"
+				+ "        <parameter>old value2</parameter>\n"
 				+ "    </service>\n"
 				+ "    <service name='b'>\n"
 				+ "        <parameter>old value</parameter>\n"
@@ -444,16 +445,26 @@ public class XmlCombinerTest {
 				+ "</config>";
 		String dominant = "\n"
 				+ "<config>\n"
-				+ "    <service name='a'>\n"
+				+ "    <service name='b'>\n"
 				+ "        <parameter>new value</parameter>\n"
 				+ "    </service>\n"
-				+ "    <service name='b'>\n"
+				+ "    <service name='a'>\n"
 				+ "        <parameter>new value2</parameter>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		String result = dominant;
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'>\n"
+				+ "        <parameter>new value2</parameter>\n"
+				+ "    </service>\n"
+				+ "    <service name='b'>\n"
+				+ "        <parameter>new value</parameter>\n"
+				+ "    </service>\n"
+				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithId(recessive, dominant)), true);
+		assertXMLNotEqual(result, combine(recessive, dominant));
+		assertXMLNotEqual(result, combineWithId("n", recessive, dominant));
+		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
 	}
 
 	private static String combine(String... inputs) throws IOException,
@@ -465,7 +476,7 @@ public class XmlCombinerTest {
 	private static String combineWithId(String idAttributeName, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		XmlCombiner combiner = new XmlCombiner();
+		XmlCombiner combiner = new XmlCombiner(idAttributeName);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 
