@@ -16,6 +16,7 @@ package org.atteo.xmlcombiner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,6 +34,8 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.Lists;
 
 public class XmlCombinerTest {
 	@Test
@@ -491,6 +494,50 @@ public class XmlCombinerTest {
 		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
 	}
 
+	@Test
+	public void shouldSupportManyCustomIdAttributes() throws IOException, SAXException, ParserConfigurationException,
+			TransformerException {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <nested>\n"
+				+ "        <service name='a'>\n"
+				+ "            <parameter>old value2</parameter>\n"
+				+ "        </service>\n"
+				+ "        <service name='b' id='2'>\n"
+				+ "            <parameter>old value2</parameter>\n"
+				+ "        </service>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <nested>\n"
+				+ "        <service name='a' id='2'>\n"
+				+ "            <parameter>new value</parameter>\n"
+				+ "        </service>\n"
+				+ "        <service name='b' id='2'>\n"
+				+ "            <parameter>new value</parameter>\n"
+				+ "        </service>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <nested>\n"
+				+ "        <service name='a'>\n"
+				+ "            <parameter>old value2</parameter>\n"
+				+ "        </service>\n"
+				+ "        <service name='b' id='2'>\n"
+				+ "            <parameter>new value</parameter>\n"
+				+ "        </service>\n"
+				+ "        <service name='a' id='2'>\n"
+				+ "            <parameter>new value</parameter>\n"
+				+ "        </service>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+
+		assertXMLIdentical(new Diff(result, combineWithId(Lists.newArrayList("name", "id"),
+				recessive, dominant)), true);
+	}
+
 	private static String combine(String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
@@ -500,7 +547,13 @@ public class XmlCombinerTest {
 	private static String combineWithId(String idAttributeName, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		XmlCombiner combiner = new XmlCombiner(idAttributeName);
+		return combineWithId(Lists.newArrayList(idAttributeName), inputs);
+	}
+
+	private static String combineWithId(List<String> idAttributeNames, String... inputs) throws IOException,
+			ParserConfigurationException, SAXException, TransformerConfigurationException,
+			TransformerException {
+		XmlCombiner combiner = new XmlCombiner(idAttributeNames);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 

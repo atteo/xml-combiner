@@ -15,17 +15,19 @@
  */
 package org.atteo.xmlcombiner;
 
+import java.util.Map;
+
 /**
  * Element name and the value of it's 'id' attribute if exists.
  */
 class Key {
-	public static final Key BEFORE_END = new Key("", "");
+	public static final Key BEFORE_END = new Key("", null);
 	private final String name;
-	private final String id;
+	private final Map<String, String> ids;
 
-	public Key(String name, String id) {
+	public Key(String name, Map<String, String> ids) {
 		this.name = name;
-		this.id = id;
+		this.ids = ids;
 	}
 
 	@Override
@@ -34,8 +36,8 @@ class Key {
 		if (name != null) {
 			hash += name.hashCode();
 		}
-		if (id != null) {
-			hash = hash * 37 + id.hashCode();
+		if (ids != null) {
+			hash = hash * 37 + ids.hashCode();
 		}
 		return hash;
 	}
@@ -52,14 +54,14 @@ class Key {
 		if ((name == null) ? (other.getName() != null) : !name.equals(other.getName())) {
 			return false;
 		}
-		if ((id == null) ? (other.getId() != null) : !id.equals(other.getId())) {
+		if ((ids == null) ? (other.getId() != null) : !ids.equals(other.getId())) {
 			return false;
 		}
 		return true;
 	}
 
-	public String getId() {
-		return id;
+	public Map<String, String> getId() {
+		return ids;
 	}
 
 	public String getName() {
@@ -68,8 +70,8 @@ class Key {
 
 	@Override
 	public String toString() {
-		if (id != null) {
-			return name + "#" + id;
+		if (ids != null) {
+			return name + "#" + ids;
 		} else {
 			return name;
 		}

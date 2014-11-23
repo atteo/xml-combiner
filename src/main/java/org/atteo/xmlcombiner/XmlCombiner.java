@@ -31,6 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 
 /**
  * Combines two or more XML DOM trees.
@@ -56,7 +57,7 @@ import com.google.common.collect.ListMultimap;
 public class XmlCombiner {
 	public static final String DEFAULT_ID_ATTRIBUTE_NAME = "id";
 	private final Document document;
-	private final String idAttributeName;
+	private final List<String> idAttributeNames;
 
 	/**
 	 * Creates XML combiner using default {@link DocumentBuilder}.
@@ -74,15 +75,23 @@ public class XmlCombiner {
 	 * Creates XML combiner using given attribute as an id.
 	 */
 	public XmlCombiner(String idAttributeName) throws ParserConfigurationException {
-		this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), idAttributeName);
+		this(Lists.newArrayList(idAttributeName));
+	}
+
+	public XmlCombiner(List<String> idAttributeNames) throws ParserConfigurationException {
+		this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), idAttributeNames);
 	}
 
 	/**
 	 * Creates XML combiner using given document builder and an id attribute name.
 	 */
 	public XmlCombiner(DocumentBuilder documentBuilder, String idAttributeName) {
+		this(documentBuilder, Lists.newArrayList(idAttributeName));
+	}
+
+	public XmlCombiner(DocumentBuilder documentBuilder, List<String> idAttributeNames) {
 		document = documentBuilder.newDocument();
-		this.idAttributeName = idAttributeName;
+		this.idAttributeNames = idAttributeNames;
 	}
 
 	/**
@@ -102,13 +111,13 @@ public class XmlCombiner {
 		if (parent != null) {
 			document.removeChild(parent);
 		}
-		Context result = combine(Context.fromElement(parent, idAttributeName),
-				Context.fromElement(element, idAttributeName));
+		Context result = combine(Context.fromElement(parent, idAttributeNames),
+				Context.fromElement(element, idAttributeNames));
 		result.addAsChildTo(document);
 	}
 
 	public Document buildDocument() {
-		filterOutDefaults(Context.fromElement(document.getDocumentElement(), idAttributeName));
+		filterOutDefaults(Context.fromElement(document.getDocumentElement(), idAttributeNames));
 		return document;
 	}
 
@@ -209,14 +218,14 @@ public class XmlCombiner {
 					&& getCombineSelf(associatedRecessives.get(0).getElement()) != CombineSelf.OVERRIDABLE_BY_TAG) {
 				// already added
 			} else {
-				Context combined = combine(Context.fromElement(null, idAttributeName), dominantContext);
+				Context combined = combine(Context.fromElement(null, idAttributeNames), dominantContext);
 				if (combined != null) {
 					combined.addAsChildTo(resultElement);
 				}
 			}
 		}
 
-		Context result = new Context(idAttributeName);
+		Context result = new Context(idAttributeNames);
 		result.setElement(resultElement);
 		appendNeighbours(dominant, result);
 
@@ -229,7 +238,7 @@ public class XmlCombiner {
 	 * @return copied element in current document
 	 */
 	private Context copyRecursively(Context context) {
-		Context copy = new Context(idAttributeName);
+		Context copy = new Context(idAttributeNames);
 
 		appendNeighbours(context, copy);
 
@@ -267,7 +276,7 @@ public class XmlCombiner {
 				context.addAsChildTo(destination.getElement(), document);
 				continue;
 			}
-			Context combined = combine(Context.fromElement(null, idAttributeName), context);
+			Context combined = combine(Context.fromElement(null, idAttributeNames), context);
 			if (combined != null) {
 				combined.addAsChildTo(destination.getElement());
 			}

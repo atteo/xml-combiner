@@ -17,7 +17,9 @@ package org.atteo.xmlcombiner;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -34,14 +36,14 @@ import com.google.common.collect.ListMultimap;
 class Context {
 	private final List<Node> neighbours = new ArrayList<>();
 	private Element element;
-	private final String idAttributeName;
+	private final List<String> idAttributeNames;
 
-	public Context(String idAttributeName) {
-		this.idAttributeName = idAttributeName;
+	public Context(List<String> idAttributeNames) {
+		this.idAttributeNames = idAttributeNames;
 	}
 
-	public static Context fromElement(Element element, String idAttributeName) {
-		Context context = new Context(idAttributeName);
+	public static Context fromElement(Element element, List<String> idAttributeNames) {
+		Context context = new Context(idAttributeNames);
 		context.setElement(element);
 		return context;
 	}
@@ -85,13 +87,13 @@ class Context {
 		NodeList nodes = element.getChildNodes();
 		List<Context> contexts = new ArrayList<>(nodes.getLength());
 
-		Context context = new Context(idAttributeName);
+		Context context = new Context(idAttributeNames);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			if (node instanceof Element) {
 				context.setElement((Element) node);
 				contexts.add(context);
-				context = new Context(idAttributeName);
+				context = new Context(idAttributeNames);
 			} else {
 				context.addNeighbour(node);
 			}
@@ -109,12 +111,14 @@ class Context {
 			Element contextElement = context.getElement();
 
 			if (contextElement != null) {
-				Attr idNode = contextElement.getAttributeNode(idAttributeName);
-				String id = null;
-				if (idNode != null) {
-					id = idNode.getValue();
+				Map<String, String> ids = new HashMap<>();
+				for (String idAttributeName : idAttributeNames) {
+					Attr idNode = contextElement.getAttributeNode(idAttributeName);
+					if (idNode != null) {
+						ids.put(idAttributeName, idNode.getValue());
+					}
 				}
-				Key key = new Key(contextElement.getTagName(), id);
+				Key key = new Key(contextElement.getTagName(), ids);
 				map.put(key, context);
 			} else {
 				map.put(Key.BEFORE_END, context);
