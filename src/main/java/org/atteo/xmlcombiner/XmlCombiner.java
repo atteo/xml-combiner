@@ -13,8 +13,11 @@
  */
 package org.atteo.xmlcombiner;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -104,13 +107,7 @@ public class XmlCombiner {
 			xmlCombiner.combine(file);
 		}
 
-		Document result = xmlCombiner.buildDocument();
-
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		Result output = new StreamResult(System.out);
-		Source input = new DOMSource(result);
-
-		transformer.transform(input, output);
+		xmlCombiner.buildDocument(System.out);
 	}
 
 	/**
@@ -188,11 +185,31 @@ public class XmlCombiner {
 	}
 
 	/**
-	 * Return the result.
+	 * Return the result of the merging process.
 	 */
 	public Document buildDocument() {
 		filterOutDefaults(Context.fromElement(document.getDocumentElement(), idAttributeNames));
 		return document;
+	}
+
+	/**
+	 * Stores the result of the merging process.
+	 */
+	public void buildDocument(OutputStream out) throws TransformerException {
+		Document result = buildDocument();
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		Result output = new StreamResult(out);
+		Source input = new DOMSource(result);
+
+		transformer.transform(input, output);
+	}
+
+	/**
+	 * Stores the result of the merging process.
+	 */
+	public void buildDocument(Path path) throws TransformerException, FileNotFoundException {
+		buildDocument(new FileOutputStream(path.toFile()));
 	}
 
 	private Context combine(Context recessive, Context dominant) {

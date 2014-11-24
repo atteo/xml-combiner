@@ -16,6 +16,9 @@ package org.atteo.xmlcombiner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,6 +31,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.custommonkey.xmlunit.Diff;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
@@ -36,6 +40,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 public class XmlCombinerTest {
 	@Test
@@ -536,6 +541,25 @@ public class XmlCombinerTest {
 
 		assertXMLIdentical(new Diff(result, combineWithId(Lists.newArrayList("name", "id"),
 				recessive, dominant)), true);
+	}
+
+	@Test
+	public void shouldSupportReadingAndStoringFiles() throws IOException, ParserConfigurationException, SAXException,
+			TransformerException {
+		// given
+		Path input = Paths.get("target/test.in");
+		Path output = Paths.get("target/test.out");
+		Files.write("<config/>", input.toFile(), StandardCharsets.UTF_8);
+
+		// when
+		XmlCombiner combiner = new XmlCombiner();
+		combiner.combine(input);
+		combiner.buildDocument(output);
+		List<String> lines = Files.readLines(output.toFile(), StandardCharsets.UTF_8);
+
+		// then
+		assertThat(lines).hasSize(1);
+		assertThat(lines.iterator().next()).contains("<config/>");
 	}
 
 	private static String combine(String... inputs) throws IOException,
