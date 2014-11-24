@@ -13,6 +13,11 @@
  */
 package org.atteo.xmlcombiner;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -22,6 +27,13 @@ import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -29,6 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -56,8 +69,49 @@ import com.google.common.collect.Lists;
  */
 public class XmlCombiner {
 	public static final String DEFAULT_ID_ATTRIBUTE_NAME = "id";
+	private final DocumentBuilder documentBuilder;
 	private final Document document;
 	private final List<String> idAttributeNames;
+
+	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
+			TransformerException {
+		List<Path> files = new ArrayList<>();
+		List<String> ids = new ArrayList<>();
+
+		boolean onlyFiles = false;
+
+		for (int i = 0; i < args.length; i++) {
+			if (!onlyFiles) {
+				switch (args[i]) {
+					case "--id":
+						ids.add(args[i+1]);
+						i++;
+						break;
+					case "--":
+						onlyFiles = true;
+						break;
+					default:
+						files.add(Paths.get(args[i]));
+				}
+			} else {
+				files.add(Paths.get(args[i]));
+			}
+		}
+
+		XmlCombiner xmlCombiner = new XmlCombiner(ids);
+
+		for (Path file : files) {
+			xmlCombiner.combine(file);
+		}
+
+		Document result = xmlCombiner.buildDocument();
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		Result output = new StreamResult(System.out);
+		Source input = new DOMSource(result);
+
+		transformer.transform(input, output);
+	}
 
 	/**
 	 * Creates XML combiner using default {@link DocumentBuilder}.
@@ -90,8 +144,25 @@ public class XmlCombiner {
 	}
 
 	public XmlCombiner(DocumentBuilder documentBuilder, List<String> idAttributeNames) {
+		this.documentBuilder = documentBuilder;
 		document = documentBuilder.newDocument();
 		this.idAttributeNames = idAttributeNames;
+	}
+
+	/**
+	 * Combine given file.
+	 * @param file file to combine
+	 */
+	public void combine(Path file) throws SAXException, IOException {
+		combine(documentBuilder.parse(file.toFile()));
+	}
+
+	/**
+	 * Combine given input stream.
+	 * @param stream input stream to combine
+	 */
+	public void combine(InputStream stream) throws SAXException, IOException {
+		combine(documentBuilder.parse(stream));
 	}
 
 	/**
@@ -116,6 +187,9 @@ public class XmlCombiner {
 		result.addAsChildTo(document);
 	}
 
+	/**
+	 * Return the result.
+	 */
 	public Document buildDocument() {
 		filterOutDefaults(Context.fromElement(document.getDocumentElement(), idAttributeNames));
 		return document;
