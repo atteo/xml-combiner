@@ -180,11 +180,24 @@ and
 </config>
 ```
 
-Here the intent is to merge 'div#button' elements between two files. So the key consist of tag name and 'id' attribute. We can tell XmlCombiner which attributes to include in the key in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) as follows:
+Here the intent is to merge 'div#button' elements between two files. So the key used to match the elements should consist of tag name and 'id' attribute. We can tell XmlCombiner which attributes to include in the key by listing their names in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) call as follows:
 
 ```java
 import org.atteo.xmlcombiner.XmlCombiner;
 
 // create combiner
 XmlCombiner combiner = new XmlCombiner("id");
+...
+```
+
+Then the result will correctly be:
+```xml
+<config>
+    <div id='title'>
+		<h1>Title</h1>
+	</div>
+    <div id='button'>
+		<button>Cancel</button>
+	</div>
+</config>
 ```
