@@ -36,14 +36,14 @@ import com.google.common.collect.ListMultimap;
 class Context {
 	private final List<Node> neighbours = new ArrayList<>();
 	private Element element;
-	private final List<String> idAttributeNames;
+	private final List<String> keyAttributeNames;
 
-	public Context(List<String> idAttributeNames) {
-		this.idAttributeNames = idAttributeNames;
+	public Context(List<String> keyAttributeNames) {
+		this.keyAttributeNames = keyAttributeNames;
 	}
 
-	public static Context fromElement(Element element, List<String> idAttributeNames) {
-		Context context = new Context(idAttributeNames);
+	public static Context fromElement(Element element, List<String> keyAttributeNames) {
+		Context context = new Context(keyAttributeNames);
 		context.setElement(element);
 		return context;
 	}
@@ -87,13 +87,13 @@ class Context {
 		NodeList nodes = element.getChildNodes();
 		List<Context> contexts = new ArrayList<>(nodes.getLength());
 
-		Context context = new Context(idAttributeNames);
+		Context context = new Context(keyAttributeNames);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			if (node instanceof Element) {
 				context.setElement((Element) node);
 				contexts.add(context);
-				context = new Context(idAttributeNames);
+				context = new Context(keyAttributeNames);
 			} else {
 				context.addNeighbour(node);
 			}
@@ -111,14 +111,14 @@ class Context {
 			Element contextElement = context.getElement();
 
 			if (contextElement != null) {
-				Map<String, String> ids = new HashMap<>();
-				for (String idAttributeName : idAttributeNames) {
-					Attr idNode = contextElement.getAttributeNode(idAttributeName);
-					if (idNode != null) {
-						ids.put(idAttributeName, idNode.getValue());
+				Map<String, String> keys = new HashMap<>();
+				for (String keyAttributeName : keyAttributeNames) {
+					Attr keyNode = contextElement.getAttributeNode(keyAttributeName);
+					if (keyNode != null) {
+						keys.put(keyAttributeName, keyNode.getValue());
 					}
 				}
-				Key key = new Key(contextElement.getTagName(), ids);
+				Key key = new Key(contextElement.getTagName(), keys);
 				map.put(key, context);
 			} else {
 				map.put(Key.BEFORE_END, context);

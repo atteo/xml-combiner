@@ -23,11 +23,11 @@ import java.util.Map;
 class Key {
 	public static final Key BEFORE_END = new Key("", null);
 	private final String name;
-	private final Map<String, String> ids;
+	private final Map<String, String> keys;
 
-	public Key(String name, Map<String, String> ids) {
+	public Key(String name, Map<String, String> keys) {
 		this.name = name;
-		this.ids = ids;
+		this.keys = keys;
 	}
 
 	@Override
@@ -36,8 +36,8 @@ class Key {
 		if (name != null) {
 			hash += name.hashCode();
 		}
-		if (ids != null) {
-			hash = hash * 37 + ids.hashCode();
+		if (keys != null) {
+			hash = hash * 37 + keys.hashCode();
 		}
 		return hash;
 	}
@@ -54,14 +54,14 @@ class Key {
 		if ((name == null) ? (other.getName() != null) : !name.equals(other.getName())) {
 			return false;
 		}
-		if ((ids == null) ? (other.getId() != null) : !ids.equals(other.getId())) {
+		if ((keys == null) ? (other.getId() != null) : !keys.equals(other.getId())) {
 			return false;
 		}
 		return true;
 	}
 
 	public Map<String, String> getId() {
-		return ids;
+		return keys;
 	}
 
 	public String getName() {
@@ -70,8 +70,8 @@ class Key {
 
 	@Override
 	public String toString() {
-		if (ids != null) {
-			return name + "#" + ids;
+		if (keys != null) {
+			return name + "#" + keys;
 		} else {
 			return name;
 		}

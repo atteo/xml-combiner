@@ -55,7 +55,7 @@ import com.google.common.collect.Lists;
  * <p>
  * The merging algorithm is as follows:<br/>
  * First direct subelements of selected node are examined.
- * The elements from both trees with matching tag names and the value of 'id' attributes are paired.
+ * The elements from both trees with matching keys are paired.
  * Based on selected behavior the content of the paired elements is then merged.
  * Finally the paired elements are recursively combined. Any not paired elements are appended.
  * </p>
@@ -71,10 +71,10 @@ import com.google.common.collect.Lists;
  * @see <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Plexus utils implementation of merging</a>
  */
 public class XmlCombiner {
-	public static final String DEFAULT_ID_ATTRIBUTE_NAME = "id";
+	public static final String DEFAULT_KEY_ATTRIBUTE_NAME = "id";
 	private final DocumentBuilder documentBuilder;
 	private final Document document;
-	private final List<String> idAttributeNames;
+	private final List<String> keyAttributeNames;
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
 			TransformerException {
@@ -86,7 +86,7 @@ public class XmlCombiner {
 		for (int i = 0; i < args.length; i++) {
 			if (!onlyFiles) {
 				switch (args[i]) {
-					case "--id":
+					case "--key":
 						ids.add(args[i+1]);
 						i++;
 						break;
@@ -119,7 +119,7 @@ public class XmlCombiner {
 	}
 
 	public XmlCombiner(DocumentBuilder documentBuilder) {
-		this(documentBuilder, DEFAULT_ID_ATTRIBUTE_NAME);
+		this(documentBuilder, DEFAULT_KEY_ATTRIBUTE_NAME);
 	}
 
 	/**
@@ -129,21 +129,21 @@ public class XmlCombiner {
 		this(Lists.newArrayList(idAttributeName));
 	}
 
-	public XmlCombiner(List<String> idAttributeNames) throws ParserConfigurationException {
-		this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), idAttributeNames);
+	public XmlCombiner(List<String> keyAttributeNames) throws ParserConfigurationException {
+		this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), keyAttributeNames);
 	}
 
 	/**
 	 * Creates XML combiner using given document builder and an id attribute name.
 	 */
-	public XmlCombiner(DocumentBuilder documentBuilder, String idAttributeName) {
-		this(documentBuilder, Lists.newArrayList(idAttributeName));
+	public XmlCombiner(DocumentBuilder documentBuilder, String keyAttributeNames) {
+		this(documentBuilder, Lists.newArrayList(keyAttributeNames));
 	}
 
-	public XmlCombiner(DocumentBuilder documentBuilder, List<String> idAttributeNames) {
+	public XmlCombiner(DocumentBuilder documentBuilder, List<String> keyAttributeNames) {
 		this.documentBuilder = documentBuilder;
 		document = documentBuilder.newDocument();
-		this.idAttributeNames = idAttributeNames;
+		this.keyAttributeNames = keyAttributeNames;
 	}
 
 	/**
@@ -179,8 +179,8 @@ public class XmlCombiner {
 		if (parent != null) {
 			document.removeChild(parent);
 		}
-		Context result = combine(Context.fromElement(parent, idAttributeNames),
-				Context.fromElement(element, idAttributeNames));
+		Context result = combine(Context.fromElement(parent, keyAttributeNames),
+				Context.fromElement(element, keyAttributeNames));
 		result.addAsChildTo(document);
 	}
 
@@ -188,7 +188,7 @@ public class XmlCombiner {
 	 * Return the result of the merging process.
 	 */
 	public Document buildDocument() {
-		filterOutDefaults(Context.fromElement(document.getDocumentElement(), idAttributeNames));
+		filterOutDefaults(Context.fromElement(document.getDocumentElement(), keyAttributeNames));
 		return document;
 	}
 
@@ -309,14 +309,14 @@ public class XmlCombiner {
 					&& getCombineSelf(associatedRecessives.get(0).getElement()) != CombineSelf.OVERRIDABLE_BY_TAG) {
 				// already added
 			} else {
-				Context combined = combine(Context.fromElement(null, idAttributeNames), dominantContext);
+				Context combined = combine(Context.fromElement(null, keyAttributeNames), dominantContext);
 				if (combined != null) {
 					combined.addAsChildTo(resultElement);
 				}
 			}
 		}
 
-		Context result = new Context(idAttributeNames);
+		Context result = new Context(keyAttributeNames);
 		result.setElement(resultElement);
 		appendNeighbours(dominant, result);
 
@@ -329,7 +329,7 @@ public class XmlCombiner {
 	 * @return copied element in current document
 	 */
 	private Context copyRecursively(Context context) {
-		Context copy = new Context(idAttributeNames);
+		Context copy = new Context(keyAttributeNames);
 
 		appendNeighbours(context, copy);
 
@@ -367,7 +367,7 @@ public class XmlCombiner {
 				context.addAsChildTo(destination.getElement(), document);
 				continue;
 			}
-			Context combined = combine(Context.fromElement(null, idAttributeNames), context);
+			Context combined = combine(Context.fromElement(null, keyAttributeNames), context);
 			if (combined != null) {
 				combined.addAsChildTo(destination.getElement());
 			}

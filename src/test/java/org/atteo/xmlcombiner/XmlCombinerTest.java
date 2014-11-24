@@ -440,7 +440,7 @@ public class XmlCombinerTest {
 	}
 
 	@Test
-	public void shouldWorkWithCustomIdAttribute() throws IOException, SAXException, ParserConfigurationException,
+	public void shouldWorkWithCustomKeys() throws IOException, SAXException, ParserConfigurationException,
 			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
@@ -471,8 +471,8 @@ public class XmlCombinerTest {
 				+ "</config>";
 
 		assertXMLNotEqual(result, combine(recessive, dominant));
-		assertXMLNotEqual(result, combineWithId("n", recessive, dominant));
-		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
+		assertXMLNotEqual(result, combineWithKey("n", recessive, dominant));
+		assertXMLIdentical(new Diff(result, combineWithKey("name", recessive, dominant)), true);
 	}
 
 	@Test
@@ -496,11 +496,11 @@ public class XmlCombinerTest {
 				+ "</config>";
 		String result = dominant;
 
-		assertXMLIdentical(new Diff(result, combineWithId("name", recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithKey("name", recessive, dominant)), true);
 	}
 
 	@Test
-	public void shouldSupportManyCustomIdAttributes() throws IOException, SAXException, ParserConfigurationException,
+	public void shouldSupportManyCustomKeys() throws IOException, SAXException, ParserConfigurationException,
 			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
@@ -565,10 +565,10 @@ public class XmlCombinerTest {
 	private static String combine(String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		return combineWithId(XmlCombiner.DEFAULT_ID_ATTRIBUTE_NAME, inputs);
+		return combineWithKey(XmlCombiner.DEFAULT_KEY_ATTRIBUTE_NAME, inputs);
 	}
 
-	private static String combineWithId(String idAttributeName, String... inputs) throws IOException,
+	private static String combineWithKey(String idAttributeName, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
 		return combineWithId(Lists.newArrayList(idAttributeName), inputs);
