@@ -21,8 +21,8 @@ public enum CombineSelf {
 	 * Merge elements.
 	 * <p>
 	 * Attributes from dominant element override those from recessive element.
-	 * Child elements are by default paired using tag name and 'id' attribute and combined recursively.
-	 * The exact behavior depends on {@link CombineChildren 'combine.children'} attribute value.
+	 * Child elements are by default paired using their keys (tag name and selected attributes) and combined
+	 * recursively. The exact behavior depends on {@link CombineChildren 'combine.children'} attribute value.
 	 * </p>
 	 * <p>
 	 *
@@ -98,7 +98,7 @@ public enum CombineSelf {
 
 	/**
 	 * Behaves exactly like {@link #MERGE} if paired element exists in any subsequent dominant document.
-	 * If paired element is not found in any dominant document behaves similar to {@link #REMOVE}
+	 * If paired element is not found in any dominant document behaves the same as {@link #REMOVE}
 	 * <p>
 	 * This behavior is specifically designed to allow specifying default values which are used only
 	 * when given element exists in any subsequent document.

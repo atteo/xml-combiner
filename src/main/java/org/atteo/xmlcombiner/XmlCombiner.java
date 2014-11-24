@@ -71,7 +71,6 @@ import com.google.common.collect.Lists;
  * @see <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Plexus utils implementation of merging</a>
  */
 public class XmlCombiner {
-	public static final String DEFAULT_KEY_ATTRIBUTE_NAME = "id";
 	private final DocumentBuilder documentBuilder;
 	private final Document document;
 	private final List<String> keyAttributeNames;
@@ -119,7 +118,7 @@ public class XmlCombiner {
 	}
 
 	public XmlCombiner(DocumentBuilder documentBuilder) {
-		this(documentBuilder, DEFAULT_KEY_ATTRIBUTE_NAME);
+		this(documentBuilder, Lists.<String>newArrayList());
 	}
 
 	/**

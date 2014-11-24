@@ -24,7 +24,7 @@ public enum CombineChildren {
 	 *
 	 * <p>
 	 * This is the default.
-	 * Those subelements which can be uniquely paired between two documents using name and id
+	 * Those subelements which can be uniquely paired between two documents using the key (tag+selected attributes)
 	 * will be merged, those that cannot be paired will be appended.<br/>
 	 * Example:<br/>
 	 * First:

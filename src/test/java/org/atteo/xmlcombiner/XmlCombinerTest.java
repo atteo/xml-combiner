@@ -52,7 +52,7 @@ public class XmlCombinerTest {
 				+ "        <parameter>parameter</parameter>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(content, combine(content, content)), true);
+		assertXMLIdentical(new Diff(content, combineWithIdKey(content, content)), true);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class XmlCombinerTest {
 				+ "    </service>\n"
 				+ "    <!-- End of configuration file -->\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class XmlCombinerTest {
 				+ "<config>\n"
 				+ "    <service id='1' parameter='other value' parameter2='parameter2' parameter3='parameter3'/>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class XmlCombinerTest {
 				+ "    <service id='2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -214,7 +214,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -241,7 +241,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -270,7 +270,7 @@ public class XmlCombinerTest {
 				+ "        <parameter2>parameter2</parameter2>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 	}
 
 	@Test
@@ -300,10 +300,10 @@ public class XmlCombinerTest {
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(recessive, combine(recessive, dominant)), true);
-		assertXMLIdentical(new Diff(dominant2, combine(recessive, dominant2)), true);
-		assertXMLIdentical(new Diff(result3, combine(recessive, dominant3)), true);
-		assertXMLIdentical(new Diff(result3, combine(recessive, dominant, dominant3)), true);
+		assertXMLIdentical(new Diff(recessive, combineWithIdKey(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
+		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant3)), true);
+		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant, dominant3)), true);
 	}
 
 	@Test
@@ -327,9 +327,9 @@ public class XmlCombinerTest {
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(recessive, combine(recessive, dominant)), true);
-		assertXMLIdentical(new Diff(dominant2, combine(recessive, dominant2)), true);
-		assertXMLIdentical(new Diff(dominant3, combine(recessive, dominant3)), true);
+		assertXMLIdentical(new Diff(recessive, combineWithIdKey(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
+		assertXMLIdentical(new Diff(dominant3, combineWithIdKey(recessive, dominant3)), true);
 	}
 
 	@Test
@@ -359,7 +359,7 @@ public class XmlCombinerTest {
 				+ "    content2\n"
 				+ "  </inner2>\n"
 				+ "</outer>";
-		assertXMLIdentical(new Diff(result, combine(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 
 		String dominant2 = "\n"
 				+ "<outer combine.children='APPEND'>\n"
@@ -379,7 +379,7 @@ public class XmlCombinerTest {
 				+ "    content3\n"
 				+ "  </inner>\n"
 				+ "</outer>";
-		assertXMLIdentical(new Diff(result2, combine(recessive, dominant2)), true);
+		assertXMLIdentical(new Diff(result2, combineWithIdKey(recessive, dominant2)), true);
 
 		String dominant3 = "\n"
 				+ "<outer combine.self='override'>\n"
@@ -394,7 +394,7 @@ public class XmlCombinerTest {
 				+ "  </inner>\n"
 				+ "</outer>";
 
-		assertXMLIdentical(new Diff(result3, combine(recessive, dominant3)), true);
+		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant3)), true);
 	}
 
 	@Test
@@ -436,7 +436,7 @@ public class XmlCombinerTest {
 				+ "        <parameter2>parameter2</parameter2>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combine(recessive, middle, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, middle, dominant)), true);
 	}
 
 	@Test
@@ -470,7 +470,7 @@ public class XmlCombinerTest {
 				+ "    </service>\n"
 				+ "</config>";
 
-		assertXMLNotEqual(result, combine(recessive, dominant));
+		assertXMLNotEqual(result, combineWithIdKey(recessive, dominant));
 		assertXMLNotEqual(result, combineWithKey("n", recessive, dominant));
 		assertXMLIdentical(new Diff(result, combineWithKey("name", recessive, dominant)), true);
 	}
@@ -562,16 +562,16 @@ public class XmlCombinerTest {
 		assertThat(lines.iterator().next()).contains("<config/>");
 	}
 
-	private static String combine(String... inputs) throws IOException,
+	private static String combineWithIdKey(String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		return combineWithKey(XmlCombiner.DEFAULT_KEY_ATTRIBUTE_NAME, inputs);
+		return combineWithKey("id", inputs);
 	}
 
-	private static String combineWithKey(String idAttributeName, String... inputs) throws IOException,
+	private static String combineWithKey(String keyAttributeNames, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		return combineWithId(Lists.newArrayList(idAttributeName), inputs);
+		return combineWithId(Lists.newArrayList(keyAttributeNames), inputs);
 	}
 
 	private static String combineWithId(List<String> idAttributeNames, String... inputs) throws IOException,
