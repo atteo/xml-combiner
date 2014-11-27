@@ -188,6 +188,7 @@ public class XmlCombiner {
 	 */
 	public Document buildDocument() {
 		filterOutDefaults(Context.fromElement(document.getDocumentElement(), keyAttributeNames));
+		filterOutCombines(document.getDocumentElement());
 		return document;
 	}
 
@@ -458,6 +459,19 @@ public class XmlCombiner {
 				element.removeChild(childContext.getElement());
 			} else {
 				filterOutDefaults(childContext);
+			}
+		}
+	}
+
+	private static void filterOutCombines(Element element) {
+		element.removeAttribute(CombineSelf.ATTRIBUTE_NAME);
+		element.removeAttribute(CombineChildren.ATTRIBUTE_NAME);
+
+		NodeList childNodes = element.getChildNodes();
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node item = childNodes.item(i);
+			if (item instanceof Element) {
+				filterOutCombines((Element) item);
 			}
 		}
 	}

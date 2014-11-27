@@ -102,7 +102,7 @@ public class XmlCombinerTest {
 				+ "</config>";
 		String result = "\n"
 				+ "<config>\n"
-				+ "    <service id='1' combine.children='append'>\n"
+				+ "    <service id='1'>\n"
 				+ "        <parameter>parameter</parameter>\n"
 				+ "        <parameter2>parameter2</parameter2>\n"
 				+ "        <parameter>other value</parameter>\n"
@@ -284,6 +284,12 @@ public class XmlCombinerTest {
 		String dominant = "\n"
 				+ "<config>\n"
 				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service id='id1'>\n"
+				+ "        <test/>\n"
+				+ "    </service>\n"
+				+ "</config>";
 		String dominant2 = "\n"
 				+ "<config>\n"
 				+ "    <service id='id1'/>\n"
@@ -294,13 +300,13 @@ public class XmlCombinerTest {
 				+ "</config>";
 		String result3 = "\n"
 				+ "<config>\n"
-				+ "    <service id='id1' combine.self='overridable'>\n"
+				+ "    <service id='id1'>\n"
 				+ "        <test/>\n"
 				+ "    </service>\n"
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(recessive, combineWithIdKey(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
 		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant3)), true);
 		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant, dominant3)), true);
@@ -318,6 +324,12 @@ public class XmlCombinerTest {
 		String dominant = "\n"
 				+ "<config>\n"
 				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service id='id1'>\n"
+				+ "        <test/>\n"
+				+ "    </service>\n"
+				+ "</config>";
 		String dominant2 = "\n"
 				+ "<config>\n"
 				+ "    <service id='id1'/>\n"
@@ -327,7 +339,7 @@ public class XmlCombinerTest {
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(recessive, combineWithIdKey(recessive, dominant)), true);
+		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
 		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
 		assertXMLIdentical(new Diff(dominant3, combineWithIdKey(recessive, dominant3)), true);
 	}
@@ -368,7 +380,7 @@ public class XmlCombinerTest {
 				+ "  </inner>\n"
 				+ "</outer>";
 		String result2 = "\n"
-				+ "<outer combine.children='APPEND'>\n"
+				+ "<outer>\n"
 				+ "  <inner>\n"
 				+ "    content\n"
 				+ "  </inner>\n"
