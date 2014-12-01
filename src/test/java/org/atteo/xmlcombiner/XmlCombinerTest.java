@@ -602,7 +602,30 @@ public class XmlCombinerTest {
 				+ "    <service id='2'/>\n"
 				+ "</config>";
 
-		System.out.println(combineWithKey("", recessive, dominant));
+		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
+	}
+
+	@Test
+	public void shouldAllowToSpecifyArtificialKey() throws IOException, SAXException, ParserConfigurationException,
+			TransformerException {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service combine.id='1' name='a'/>\n"
+				+ "    <service combine.id='2' name='b'/>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service combine.id='1' name='c'/>\n"
+				+ "    <service combine.id='3' name='d'/>\n"
+				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service name='c'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "    <service name='d'/>\n"
+				+ "</config>";
+
+		//System.out.println(combineWithKey("", recessive, dominant));
 		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
 	}
 

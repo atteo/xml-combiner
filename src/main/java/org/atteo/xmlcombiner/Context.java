@@ -118,6 +118,12 @@ class Context {
 						keys.put(keyAttributeName, keyNode.getValue());
 					}
 				}
+				{
+					Attr keyNode = contextElement.getAttributeNode(Context.ID_ATTRIBUTE_NAME);
+					if (keyNode != null) {
+						keys.put(Context.ID_ATTRIBUTE_NAME, keyNode.getValue());
+					}
+				}
 				Key key = new Key(contextElement.getTagName(), keys);
 				map.put(key, context);
 			} else {

@@ -241,5 +241,36 @@ Multiple keys can be specified by separating them using comma, for example:
 ...
 ```
 
+Artificial key
+--------------
+Sometimes the XML file format does not contain any usable keys. In this case you can specify an artificial key in 'combine.id' attribute.
+For instance combining
 
+```xml
+<config>
+    <service combine.id='1' name='a'/>
+    <service combine.id='2' name='b'/>
+</config>
+```
+
+with
+
+```xml
+<config>
+    <service combine.id='1' name='c'/>
+    <service combine.id='3' name='d'/>
+</config>
+```
+
+will result in
+
+```xml
+<config>
+    <service name='c'/>
+    <service name='b'/>
+    <service name='d'/>
+</config>
+```
+
+Notice how 'combine.id' attribute was removed from the final output.
 

@@ -481,6 +481,7 @@ public class XmlCombiner {
 		element.removeAttribute(CombineSelf.ATTRIBUTE_NAME);
 		element.removeAttribute(CombineChildren.ATTRIBUTE_NAME);
 		element.removeAttribute(Context.KEYS_ATTRIBUTE_NAME);
+		element.removeAttribute(Context.ID_ATTRIBUTE_NAME);
 
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
