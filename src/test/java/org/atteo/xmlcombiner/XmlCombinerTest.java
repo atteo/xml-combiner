@@ -556,6 +556,58 @@ public class XmlCombinerTest {
 	}
 
 	@Test
+	public void shouldAllowToSpecifyKeys() throws IOException, SAXException, ParserConfigurationException,
+			TransformerException {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'/>\n"
+				+ "    <service id='2'/>\n"
+				+ "    <nested combine.keys='id'>\n"
+				+ "        <service id='1'/>\n"
+				+ "        <service id='2'/>\n"
+				+ "        <nested>\n"
+				+ "            <service id='1'/>\n"
+				+ "            <service id='2'/>\n"
+				+ "        </nested>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'/>\n"
+				+ "    <service id='2'/>\n"
+				+ "    <nested>\n"
+				+ "        <service id='1'/>\n"
+				+ "        <service id='2'/>\n"
+				+ "        <nested combine.keys='name'>\n"
+				+ "            <service id='1'/>\n"
+				+ "            <service id='2'/>\n"
+				+ "        </nested>\n"
+				+ "    </nested>\n"
+				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'/>\n"
+				+ "    <service id='2'/>\n"
+				+ "    <nested>\n"
+				+ "        <service id='1'/>\n"
+				+ "        <service id='2'/>\n"
+				+ "        <nested>\n"
+				+ "            <service id='1'/>\n"
+				+ "            <service id='2'/>\n"
+				+ "            <service id='1'/>\n"
+				+ "            <service id='2'/>\n"
+				+ "        </nested>\n"
+				+ "    </nested>\n"
+				+ "    <service id='1'/>\n"
+				+ "    <service id='2'/>\n"
+				+ "</config>";
+
+		System.out.println(combineWithKey("", recessive, dominant));
+		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
+	}
+
+
+	@Test
 	public void shouldSupportReadingAndStoringFiles() throws IOException, ParserConfigurationException, SAXException,
 			TransformerException {
 		// given

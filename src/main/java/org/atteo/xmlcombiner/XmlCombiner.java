@@ -46,6 +46,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 
@@ -73,7 +74,7 @@ import com.google.common.collect.Lists;
 public class XmlCombiner {
 	private final DocumentBuilder documentBuilder;
 	private final Document document;
-	private final List<String> keyAttributeNames;
+	private final List<String> defaultAttributeNames;
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
 			TransformerException {
@@ -142,7 +143,7 @@ public class XmlCombiner {
 	public XmlCombiner(DocumentBuilder documentBuilder, List<String> keyAttributeNames) {
 		this.documentBuilder = documentBuilder;
 		document = documentBuilder.newDocument();
-		this.keyAttributeNames = keyAttributeNames;
+		this.defaultAttributeNames = keyAttributeNames;
 	}
 
 	/**
@@ -178,8 +179,7 @@ public class XmlCombiner {
 		if (parent != null) {
 			document.removeChild(parent);
 		}
-		Context result = combine(Context.fromElement(parent, keyAttributeNames),
-				Context.fromElement(element, keyAttributeNames));
+		Context result = combine(Context.fromElement(parent), Context.fromElement(element));
 		result.addAsChildTo(document);
 	}
 
@@ -187,7 +187,7 @@ public class XmlCombiner {
 	 * Return the result of the merging process.
 	 */
 	public Document buildDocument() {
-		filterOutDefaults(Context.fromElement(document.getDocumentElement(), keyAttributeNames));
+		filterOutDefaults(Context.fromElement(document.getDocumentElement()));
 		filterOutCombines(document.getDocumentElement());
 		return document;
 	}
@@ -260,8 +260,22 @@ public class XmlCombiner {
 			resultElement.removeAttribute(CombineSelf.ATTRIBUTE_NAME);
 		}
 
-		ListMultimap<Key, Context> recessiveContexts = recessive.mapChildContexts();
-		ListMultimap<Key, Context> dominantContexts = dominant.mapChildContexts();
+		List<String> keys = defaultAttributeNames;
+		if (recessive.getElement() != null) {
+			Attr keysNode = recessive.getElement().getAttributeNode(Context.KEYS_ATTRIBUTE_NAME);
+			if (keysNode != null) {
+				keys = Splitter.on(",").splitToList(keysNode.getValue());
+			}
+		}
+		if (dominant.getElement() != null) {
+			Attr keysNode = dominant.getElement().getAttributeNode(Context.KEYS_ATTRIBUTE_NAME);
+			if (keysNode != null) {
+				keys = Splitter.on(",").splitToList(keysNode.getValue());
+			}
+		}
+
+		ListMultimap<Key, Context> recessiveContexts = recessive.mapChildContexts(keys);
+		ListMultimap<Key, Context> dominantContexts = dominant.mapChildContexts(keys);
 
 		Set<String> tagNamesInDominant = getTagNames(dominantContexts);
 
@@ -309,14 +323,14 @@ public class XmlCombiner {
 					&& getCombineSelf(associatedRecessives.get(0).getElement()) != CombineSelf.OVERRIDABLE_BY_TAG) {
 				// already added
 			} else {
-				Context combined = combine(Context.fromElement(null, keyAttributeNames), dominantContext);
+				Context combined = combine(Context.fromElement(null), dominantContext);
 				if (combined != null) {
 					combined.addAsChildTo(resultElement);
 				}
 			}
 		}
 
-		Context result = new Context(keyAttributeNames);
+		Context result = new Context();
 		result.setElement(resultElement);
 		appendNeighbours(dominant, result);
 
@@ -329,7 +343,7 @@ public class XmlCombiner {
 	 * @return copied element in current document
 	 */
 	private Context copyRecursively(Context context) {
-		Context copy = new Context(keyAttributeNames);
+		Context copy = new Context();
 
 		appendNeighbours(context, copy);
 
@@ -367,7 +381,7 @@ public class XmlCombiner {
 				context.addAsChildTo(destination.getElement(), document);
 				continue;
 			}
-			Context combined = combine(Context.fromElement(null, keyAttributeNames), context);
+			Context combined = combine(Context.fromElement(null), context);
 			if (combined != null) {
 				combined.addAsChildTo(destination.getElement());
 			}
@@ -466,6 +480,7 @@ public class XmlCombiner {
 	private static void filterOutCombines(Element element) {
 		element.removeAttribute(CombineSelf.ATTRIBUTE_NAME);
 		element.removeAttribute(CombineChildren.ATTRIBUTE_NAME);
+		element.removeAttribute(Context.KEYS_ATTRIBUTE_NAME);
 
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {

@@ -180,7 +180,11 @@ and
 </config>
 ```
 
-Here the intent is to merge 'div#button' elements between two files. So the key used to match the elements should consist of tag name and 'id' attribute. We can tell XmlCombiner which attributes to include in the key by listing their names in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) call as follows:
+Here the intent is to merge 'div#button' elements between two files. So the key used to match the elements should consist of tag name and 'id' attribute.
+
+Global keys
+-----------
+We can tell XmlCombiner which attributes to include in the key by listing their names in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) call as follows:
 
 ```java
 import org.atteo.xmlcombiner.XmlCombiner;
@@ -201,3 +205,41 @@ Then the result will correctly be:
 	</div>
 </config>
 ```
+
+Local keys
+----------
+Another option to specify the keys is within the XML document itself.
+For instance combining
+
+```xml
+<config combine.keys='id'>
+    <service id='first' name='alpha'/>
+    <service id='second' name='beta'/>
+</config>
+```
+
+with
+
+```xml
+<config>
+    <service id='second' name='theta'/>
+</config>
+```
+
+will result in
+
+```xml
+<config>
+    <service id='first' name='alpha'/>
+    <service id='second' name='theta'/>
+</config>
+```
+
+Multiple keys can be specified by separating them using comma, for example:
+```xml
+<config combine.keys='id,name'>
+...
+```
+
+
+

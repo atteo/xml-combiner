@@ -34,16 +34,16 @@ import com.google.common.collect.ListMultimap;
  * DOM {@link Element} with any other non-element nodes which precede it.
  */
 class Context {
+	public static final String KEYS_ATTRIBUTE_NAME = "combine.keys";
+	public static final String ID_ATTRIBUTE_NAME = "combine.id";
 	private final List<Node> neighbours = new ArrayList<>();
 	private Element element;
-	private final List<String> keyAttributeNames;
 
-	public Context(List<String> keyAttributeNames) {
-		this.keyAttributeNames = keyAttributeNames;
+	public Context() {
 	}
 
-	public static Context fromElement(Element element, List<String> keyAttributeNames) {
-		Context context = new Context(keyAttributeNames);
+	public static Context fromElement(Element element) {
+		Context context = new Context();
 		context.setElement(element);
 		return context;
 	}
@@ -87,13 +87,13 @@ class Context {
 		NodeList nodes = element.getChildNodes();
 		List<Context> contexts = new ArrayList<>(nodes.getLength());
 
-		Context context = new Context(keyAttributeNames);
+		Context context = new Context();
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			if (node instanceof Element) {
 				context.setElement((Element) node);
 				contexts.add(context);
-				context = new Context(keyAttributeNames);
+				context = new Context();
 			} else {
 				context.addNeighbour(node);
 			}
@@ -103,7 +103,7 @@ class Context {
 		return contexts;
 	}
 
-	public ListMultimap<Key, Context> mapChildContexts() {
+	public ListMultimap<Key, Context> mapChildContexts(List<String> keyAttributeNames) {
 		List<Context> contexts = groupChildContexts();
 
 		ListMultimap<Key, Context> map = LinkedListMultimap.create();
