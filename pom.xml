@@ -7,7 +7,7 @@
 		<version>1.13</version>
 	</parent>
 	<artifactId>xml-combiner</artifactId>
-	<version>1-SNAPSHOT</version>
+	<version>2.2</version>
 	<name>Atteo XML combiner</name>
 	<dependencies>
 		<dependency>
