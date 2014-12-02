@@ -274,3 +274,8 @@ will result in
 
 Notice how 'combine.id' attribute was removed from the final output.
 
+Alternatives
+============
+* [Plexus Utils Xpp3DomUtils](http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html) - used by Maven to merge plugin configurations, not so straightforward to use outside Maven
+* [EL4J XmlMerge](http://www.javaworld.com/article/2077736/open-source-tools/xml-merging-made-easy.html) - slightly different algorithm, it allows to specify merging behavior in separate file
+
