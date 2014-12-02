@@ -36,7 +36,9 @@ import org.custommonkey.xmlunit.Diff;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
@@ -551,7 +553,7 @@ public class XmlCombinerTest {
 				+ "    </nested>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithId(Lists.newArrayList("name", "id"),
+		assertXMLIdentical(new Diff(result, combineWithKeys(Lists.newArrayList("name", "id"),
 				recessive, dominant)), true);
 	}
 
@@ -629,6 +631,50 @@ public class XmlCombinerTest {
 		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
 	}
 
+	@Test
+	public void shouldSupportFilters() throws SAXException, IOException, ParserConfigurationException,
+			TransformerException {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service combine.id='1' value='1'/>\n"
+				+ "    <service combine.id='2' value='2'/>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service combine.id='1' value='10'/>\n"
+				+ "    <service combine.id='3' value='20'/>\n"
+				+ "</config>";
+		String result = "\n"
+				+ "<config processed='true'>\n"
+				+ "    <service value='11' processed='true'/>\n"
+				+ "    <service value='2' processed='true'/>\n"
+				+ "    <service value='20' processed='true'/>\n"
+				+ "</config>";
+
+		XmlCombiner.Filter filter = new XmlCombiner.Filter() {
+			@Override
+			public void postProcess(Element recessive, Element dominant, Element result) {
+				result.setAttribute("processed", "true");
+				if (recessive == null || dominant == null) {
+					return;
+				}
+				Attr recessiveNode = recessive.getAttributeNode("value");
+				Attr dominantNode = dominant.getAttributeNode("value");
+				if (recessiveNode == null || dominantNode == null) {
+					return;
+				}
+
+				int recessiveValue = Integer.parseInt(recessiveNode.getValue());
+				int dominantValue = Integer.parseInt(dominantNode.getValue());
+
+				result.setAttribute("value", Integer.toString(recessiveValue + dominantValue));
+			}
+		};
+		System.out.println(combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive, dominant));
+		assertXMLIdentical(new Diff(result, combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive,
+				dominant)), true);
+	}
+
 
 	@Test
 	public void shouldSupportReadingAndStoringFiles() throws IOException, ParserConfigurationException, SAXException,
@@ -655,16 +701,36 @@ public class XmlCombinerTest {
 		return combineWithKey("id", inputs);
 	}
 
-	private static String combineWithKey(String keyAttributeNames, String... inputs) throws IOException,
+	private static String combineWithKey(String keyAttributeName, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		return combineWithId(Lists.newArrayList(keyAttributeNames), inputs);
+		return combineWithKeys(Lists.newArrayList(keyAttributeName), inputs);
 	}
 
-	private static String combineWithId(List<String> idAttributeNames, String... inputs) throws IOException,
+	private static String combineWithKeys(List<String> keyAttributeNames, String... inputs) throws IOException,
 			ParserConfigurationException, SAXException, TransformerConfigurationException,
 			TransformerException {
-		XmlCombiner combiner = new XmlCombiner(idAttributeNames);
+		XmlCombiner combiner = new XmlCombiner(keyAttributeNames);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		for (String input : inputs) {
+			Document document = builder.parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+			combiner.combine(document);
+		}
+		Document result = combiner.buildDocument();
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter writer = new StringWriter();
+		transformer.transform(new DOMSource(result), new StreamResult(writer));
+		return writer.toString();
+	}
+
+	private static String combineWithKeysAndFilter(List<String> keyAttributeNames, XmlCombiner.Filter filter,
+			String... inputs) throws IOException, ParserConfigurationException, SAXException,
+			TransformerConfigurationException, TransformerException {
+		XmlCombiner combiner = new XmlCombiner(keyAttributeNames);
+		combiner.setFilter(filter);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 

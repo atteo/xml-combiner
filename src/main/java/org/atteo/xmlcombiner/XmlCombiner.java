@@ -72,9 +72,28 @@ import com.google.common.collect.Lists;
  * @see <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Plexus utils implementation of merging</a>
  */
 public class XmlCombiner {
+	/**
+	 * Allows to filter the result of the merging.
+	 */
+	public interface Filter {
+		/**
+		 * Post process the matching elements after merging.
+		 * @param recessive recessive element, can be null, should not be modified
+		 * @param dominant dominant element, can be null, should not be modified
+		 * @param result result element, will not be null, it can be freely modified
+		 */
+		void postProcess(Element recessive, Element dominant, Element result);
+	}
+
 	private final DocumentBuilder documentBuilder;
 	private final Document document;
 	private final List<String> defaultAttributeNames;
+	private static final Filter NULL_FILTER = new Filter() {
+		@Override
+		public void postProcess(Element recessive, Element dominant, Element result) {
+		}
+	};
+	private Filter filter = NULL_FILTER;
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
 			TransformerException {
@@ -144,6 +163,17 @@ public class XmlCombiner {
 		this.documentBuilder = documentBuilder;
 		document = documentBuilder.newDocument();
 		this.defaultAttributeNames = keyAttributeNames;
+	}
+
+	/**
+	 * Sets the filter.
+	 */
+	public void setFilter(Filter filter) {
+		if (filter ==  null) {
+			this.filter = NULL_FILTER;
+			return;
+		}
+		this.filter = filter;
 	}
 
 	/**
@@ -292,6 +322,7 @@ public class XmlCombiner {
 				if (getCombineSelf(recessiveContext.getElement()) == CombineSelf.OVERRIDABLE_BY_TAG) {
 					if (!tagNamesInDominant.contains(key.getName())) {
 						recessiveContext.addAsChildTo(resultElement);
+						filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
 					}
 					continue;
 				}
@@ -305,6 +336,9 @@ public class XmlCombiner {
 					}
 				} else {
 					recessiveContext.addAsChildTo(resultElement);
+					if (recessiveContext.getElement() != null) {
+						filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
+					}
 				}
 			}
 		}
@@ -315,6 +349,9 @@ public class XmlCombiner {
 
 			if (key == Key.BEFORE_END) {
 				dominantContext.addAsChildTo(resultElement, document);
+				if (dominantContext.getElement() != null) {
+					filter.postProcess(null, dominantContext.getElement(), dominantContext.getElement());
+				}
 				// break? this should be the last anyway...
 				continue;
 			}
@@ -333,6 +370,8 @@ public class XmlCombiner {
 		Context result = new Context();
 		result.setElement(resultElement);
 		appendNeighbours(dominant, result);
+
+		filter.postProcess(recessive.getElement(), dominant.getElement(), result.getElement());
 
 		return result;
 	}
