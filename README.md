@@ -274,6 +274,61 @@ will result in
 
 Notice how 'combine.id' attribute was removed from the final output.
 
+Filtering
+=========
+Filtering gives you the ability to further modify the resulting XML. For instance given two documents
+```xml
+<config>
+    <element name='hydrogen' weight='1'/>
+    <element name='helium' weight='2'/>
+</config>
+```
+
+and
+
+```xml
+<config>
+    <element name='hydrogen' weight='10'/>
+    <element name='lithium' weight='20'/>
+</config>
+```
+
+we want to get
+
+```xml
+<config>\n"
+    <element name='hydrogen' weight='11'/>
+    <element name='helium' weight='2'/>
+    <element name='lithium' weight='20'/>
+</config>
+```
+
+That is, we want the weight to be the sum of the weights of the merged elements. To achieve that we can define the filter like this:
+
+```java
+XmlCombiner.Filter weightFilter = new XmlCombiner.Filter() {
+	@Override
+	public void postProcess(Element recessive, Element dominant, Element result) {
+		if (recessive == null || dominant == null) {
+			return;
+		}
+		Attr recessiveNode = recessive.getAttributeNode("weight");
+		Attr dominantNode = dominant.getAttributeNode("weight");
+		if (recessiveNode == null || dominantNode == null) {
+			return;
+		}
+
+		int recessiveWeight = Integer.parseInt(recessiveNode.getValue());
+		int dominantWeight = Integer.parseInt(dominantNode.getValue());
+
+		result.setAttribute("weight", Integer.toString(recessiveWeight + dominantWeight));
+	}
+};
+
+XmlCombiner combiner = new XmlCombiner("name");
+combiner.setFilter(weightFilter);
+```
+
 Alternatives
 ============
 * [Plexus Utils Xpp3DomUtils](http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html) - used by Maven to merge plugin configurations, not so straightforward to use outside Maven

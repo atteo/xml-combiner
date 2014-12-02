@@ -670,7 +670,7 @@ public class XmlCombinerTest {
 				result.setAttribute("value", Integer.toString(recessiveValue + dominantValue));
 			}
 		};
-		System.out.println(combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive, dominant));
+		//System.out.println(combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive, dominant));
 		assertXMLIdentical(new Diff(result, combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive,
 				dominant)), true);
 	}
