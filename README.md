@@ -62,10 +62,19 @@ combiner.buildDocument(resultFile);
 
 ```
 
+Maven dependency is:
+```xml
+<dependency>
+    <groupId>org.atteo</groupId>
+    <artifactId>xml-combiner</artifactId>
+    <version>2.2</version>
+</dependency>
+```
+
 Controlling the merging behavior
 ================================
 
-By default matching tags from two files are [merged](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#MERGE). That is, given two XML documents:
+By default matching tags from two files are [merged](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#MERGE). That is, given two XML documents:
 ```xml
 <config>
 	<name>John</name>
@@ -91,9 +100,9 @@ the result would be:
 
 Observe how the default behavior resulted in using the content of the &lt;name&gt; tag from the second file, ignoring the content from the first one.
 
-If instead we would like for the children of the &lt;config&gt; tag from the second file to be appended to the children of the &lt;config&gt; tag from the first file then we can alter the way the combiner works using special ['combine.children'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html) attribute.
+If instead we would like for the children of the &lt;config&gt; tag from the second file to be appended to the children of the &lt;config&gt; tag from the first file then we can alter the way the combiner works using special ['combine.children'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html) attribute.
 
-Merging first file with 'combine.children' attribute set to ['append'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/  atteo/xmlcombiner/CombineChildren.html#APPEND) value:
+Merging first file with 'combine.children' attribute set to ['append'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/  atteo/xmlcombiner/CombineChildren.html#APPEND) value:
 ```xml
 <config combine.children='append'>
     <name>John</name>
@@ -119,7 +128,7 @@ results in
 </config>
 ```
 
-In addition there is also ['combine.self'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html) attribute which allows to control how the element itself is combined.
+In addition there is also ['combine.self'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html) attribute which allows to control how the element itself is combined.
 Combining
 
 ```xml
@@ -147,12 +156,12 @@ Below you can find the table of all allowed values which link to their detailed 
 
 | CombineChildren | CombineSelf |
 |-----------------|-------------|
-| [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#MERGE) (default) | [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#MERGE) (default) |
-| [append](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#APPEND) | [defaults](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#DEFAULTS) |
-| | [overridable](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE) |
-| | [overridable_by_tag](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE_BY_TAG) |
-| | [override](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDE) |
-| | [remove](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#REMOVE) | 
+| [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#MERGE) (default) | [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#MERGE) (default) |
+| [append](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#APPEND) | [defaults](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#DEFAULTS) |
+| | [overridable](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE) |
+| | [overridable_by_tag](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE_BY_TAG) |
+| | [override](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDE) |
+| | [remove](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#REMOVE) | 
 
 Matching the elements
 =====================
@@ -184,7 +193,7 @@ Here the intent is to merge 'div#button' elements between two files. So the key 
 
 Global keys
 -----------
-We can tell XmlCombiner which attributes to include in the key by listing their names in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.0/xml-combiner-2.0-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) call as follows:
+We can tell XmlCombiner which attributes to include in the key by listing their names in its [constructor](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/XmlCombiner.html#XmlCombiner(java.lang.String)) call as follows:
 
 ```java
 import org.atteo.xmlcombiner.XmlCombiner;
