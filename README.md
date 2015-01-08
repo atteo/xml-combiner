@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/atteo/xml-combiner.svg)](https://travis-ci.org/atteo/xml-combiner)
+[![Coverage Status](https://img.shields.io/coveralls/atteo/xml-combiner.svg)](https://coveralls.io/r/atteo/xml-combiner)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.atteo/xml-combiner/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.atteo/xml-combiner)
+
 Overview
 ========
 XmlCombiner allows to combine multiple XML files into one.
@@ -217,7 +221,7 @@ Then the result will correctly be:
 
 Local keys
 ----------
-Another option to specify the keys is within the XML document itself.
+Another option to specify the keys is within the XML document itself using 'combine.keys' attribute.
 For instance combining
 
 ```xml
@@ -305,7 +309,7 @@ and
 we want to get
 
 ```xml
-<config>\n"
+<config>
     <element name='hydrogen' weight='11'/>
     <element name='helium' weight='2'/>
     <element name='lithium' weight='20'/>
