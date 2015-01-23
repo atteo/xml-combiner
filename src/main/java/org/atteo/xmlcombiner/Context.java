@@ -17,18 +17,12 @@ package org.atteo.xmlcombiner;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
 
 /**
  * DOM {@link Element} with any other non-element nodes which precede it.
@@ -101,36 +95,6 @@ class Context {
 		// add last with empty element
 		contexts.add(context);
 		return contexts;
-	}
-
-	public ListMultimap<Key, Context> mapChildContexts(List<String> keyAttributeNames) {
-		List<Context> contexts = groupChildContexts();
-
-		ListMultimap<Key, Context> map = LinkedListMultimap.create();
-		for (Context context : contexts) {
-			Element contextElement = context.getElement();
-
-			if (contextElement != null) {
-				Map<String, String> keys = new HashMap<>();
-				for (String keyAttributeName : keyAttributeNames) {
-					Attr keyNode = contextElement.getAttributeNode(keyAttributeName);
-					if (keyNode != null) {
-						keys.put(keyAttributeName, keyNode.getValue());
-					}
-				}
-				{
-					Attr keyNode = contextElement.getAttributeNode(Context.ID_ATTRIBUTE_NAME);
-					if (keyNode != null) {
-						keys.put(Context.ID_ATTRIBUTE_NAME, keyNode.getValue());
-					}
-				}
-				Key key = new Key(contextElement.getTagName(), keys);
-				map.put(key, context);
-			} else {
-				map.put(Key.BEFORE_END, context);
-			}
-		}
-		return map;
 	}
 
 	@Override
