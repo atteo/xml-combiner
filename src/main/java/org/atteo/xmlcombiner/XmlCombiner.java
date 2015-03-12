@@ -94,6 +94,7 @@ public class XmlCombiner {
 		}
 	};
 	private Filter filter = NULL_FILTER;
+	private final ChildContextsMapper childContextMapper = new KeyAttributesChildContextsMapper();
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
 			TransformerException {
@@ -304,8 +305,8 @@ public class XmlCombiner {
 			}
 		}
 
-		ListMultimap<Key, Context> recessiveContexts = recessive.mapChildContexts(keys);
-		ListMultimap<Key, Context> dominantContexts = dominant.mapChildContexts(keys);
+		ListMultimap<Key, Context> recessiveContexts = childContextMapper.mapChildContexts(recessive, keys);
+		ListMultimap<Key, Context> dominantContexts = childContextMapper.mapChildContexts(dominant, keys);
 
 		Set<String> tagNamesInDominant = getTagNames(dominantContexts);
 
@@ -536,7 +537,7 @@ public class XmlCombiner {
 		for (Key key : dominantContexts.keys()) {
 			names.add(key.getName());
 		}
-	
+
 		return names;
 	}
 }
