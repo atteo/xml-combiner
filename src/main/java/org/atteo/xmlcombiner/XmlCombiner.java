@@ -84,6 +84,17 @@ public class XmlCombiner {
 		 */
 		void postProcess(Element recessive, Element dominant, Element result);
 	}
+	
+	/**
+	 * Allows to change the element merge behavior at runtime.
+	 */
+	public interface MergeFilter {
+		/**
+		 * Specify merging technique for the element.
+		 * @param element current element for which to provide the merging behavior
+		 */
+		CombineChildren query(Element element);
+	}
 
 	private final DocumentBuilder documentBuilder;
 	private final Document document;
@@ -93,7 +104,14 @@ public class XmlCombiner {
 		public void postProcess(Element recessive, Element dominant, Element result) {
 		}
 	};
+	private static final MergeFilter DEFAULT_MERGE_FILTER = new MergeFilter() {
+		@Override
+		public CombineChildren query(Element element) {
+			return CombineChildren.MERGE;
+		}
+	};
 	private Filter filter = NULL_FILTER;
+	private MergeFilter mergeFilter = DEFAULT_MERGE_FILTER;
 	private final ChildContextsMapper childContextMapper = new KeyAttributesChildContextsMapper();
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException,
@@ -175,6 +193,17 @@ public class XmlCombiner {
 			return;
 		}
 		this.filter = filter;
+	}
+	
+	/**
+	 * Sets the merging behavior filter.
+	 */
+	public void setFilter(MergeFilter mergeFilter) {
+		if (mergeFilter ==  null) {
+			this.mergeFilter = DEFAULT_MERGE_FILTER;
+			return;
+		}
+		this.mergeFilter = mergeFilter;
 	}
 
 	/**
@@ -258,9 +287,15 @@ public class XmlCombiner {
 
 		CombineChildren combineChildren = getCombineChildren(dominant.getElement());
 		if (combineChildren == null) {
-			combineChildren = getCombineChildren(recessive.getElement());
+			combineChildren = mergeFilter.query(dominant.getElement());
 			if (combineChildren == null) {
-				combineChildren = CombineChildren.MERGE;
+				combineChildren = getCombineChildren(recessive.getElement());
+				if (combineChildren == null) {
+					combineChildren = mergeFilter.query(recessive.getElement());
+					if (combineChildren == null) {
+						combineChildren = CombineChildren.MERGE;
+					}
+				}
 			}
 		}
 
