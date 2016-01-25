@@ -13,6 +13,11 @@
  */
 package org.atteo.xmlcombiner;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,10 +36,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import org.custommonkey.xmlunit.Diff;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -673,6 +676,162 @@ public class XmlCombinerTest {
 		//System.out.println(combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive, dominant));
 		assertXMLIdentical(new Diff(result, combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive,
 				dominant)), true);
+	}
+	
+	@Ignore
+	@Test
+	public void supportRuntimeMergeFilterSelective() throws Exception {
+		//TODO: make it work - needs XmlCombiner logic fix
+		String recessive = "\n"
+				+ "<root>\n"
+				+ "  <config>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.1</option>\n"
+				+ "    		<option>1.2</option>\n"
+				+ "    </service>\n"
+				+ "  </config>\n"
+				+ "  <config>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.3</option>\n"
+				+ "    		<option>1.4</option>\n"
+				+ "    </service>\n"
+				+ "  </config>\n"
+				+ "</root>";
+		String dominant = "\n"
+				+ "<root>\n"
+				+ "  <config>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.1</option>\n"
+				+ "    		<option>1.2</option>\n"
+				+ "    </service>\n"
+				+ "  </config>\n"
+				+ "  <config>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.3</option>\n"
+				+ "    		<option>1.4</option>\n"
+				+ "    </service>\n"
+				+ "  </config>\n"
+				+ "</root>";
+		String expected = "\n"
+				+ "<root>\n"
+				+ "  <config>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.1</option>\n"
+				+ "    		<option>1.2</option>\n"
+				+ "    </service>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.1</option>\n"
+				+ "    		<option>1.2</option>\n"
+				+ "    </service>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.3</option>\n"
+				+ "    		<option>1.4</option>\n"
+				+ "    </service>\n"
+				+ "    <service>\n"
+				+ "    		<option>1.3</option>\n"
+				+ "    		<option>1.4</option>\n"
+				+ "    </service>\n"
+				+ "  </config>"
+				+ "</root>";
+		
+		XmlCombiner.MergeFilter filter = new XmlCombiner.MergeFilter() {
+			@Override
+			public CombineChildren query(Element element) {
+				if (element.getTagName().equals("root")) {
+					return CombineChildren.MERGE; // for config tags
+				} else if (element.getTagName().equals("config")) {
+					return CombineChildren.APPEND; // for service tags
+				}
+				
+				return CombineChildren.MERGE; // for config tags
+			}
+		};
+		
+		applyMergeFilter(new String[]{recessive, dominant}, filter, expected, false);
+	}
+	
+	@Test
+	public void supportRuntimeMergeFilterAppendDifferent() throws Exception {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service name='c'/>\n"
+				+ "    <service name='d'/>\n"
+				+ "</config>";
+		String expected = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "    <service name='c'/>\n"
+				+ "    <service name='d'/>\n"
+				+ "</config>";
+		
+		XmlCombiner.MergeFilter filter = new XmlCombiner.MergeFilter() {
+			@Override
+			public CombineChildren query(Element element) {
+				return CombineChildren.APPEND;
+			}
+		};
+		
+		applyMergeFilter(new String[]{recessive, dominant}, filter, expected, true);
+	}
+	
+	@Test
+	public void supportRuntimeMergeFilterSameAppend() throws Exception {
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "</config>";
+		String expected = "\n"
+				+ "<config>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "    <service name='a'/>\n"
+				+ "    <service name='b'/>\n"
+				+ "</config>";
+
+		XmlCombiner.MergeFilter filter = new XmlCombiner.MergeFilter() {
+			@Override
+			public CombineChildren query(Element element) {
+				return CombineChildren.APPEND;
+			}
+		};
+		
+		applyMergeFilter(new String[]{recessive, dominant}, filter, expected, true);
+	}
+	
+	private void applyMergeFilter(String[] inputs, XmlCombiner.MergeFilter filter, String expected, boolean identical) throws Exception {
+		XmlCombiner combiner = new XmlCombiner();
+		combiner.setFilter(filter);
+		
+		for (String input : inputs) {
+			combiner.combine(new ByteArrayInputStream(input.getBytes()));
+		}
+		Document combinedResult = combiner.buildDocument();
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter writer = new StringWriter();
+		transformer.transform(new DOMSource(combinedResult), new StreamResult(writer));
+		String result = writer.toString();
+
+		if (identical) {
+			assertXMLIdentical(new Diff(result, expected), true);
+		} else {
+			System.out.println(expected);
+			System.out.println("-");
+			System.out.println(result);
+			assertXMLEqual(expected, result);
+		}
 	}
 
 
