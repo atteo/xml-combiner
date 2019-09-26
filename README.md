@@ -106,11 +106,11 @@ Observe how the default behavior resulted in using the content of the &lt;name&g
 
 If instead we would like for the children of the &lt;config&gt; tag from the second file to be appended to the children of the &lt;config&gt; tag from the first file then we can alter the way the combiner works using special ['combine.children'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html) attribute.
 
-Merging first file with 'combine.children' attribute set to ['append'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/  atteo/xmlcombiner/CombineChildren.html#APPEND) value:
+Merging first file with 'combine.children' attribute set to ['append'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#APPEND) value:
 ```xml
 <config combine.children='append'>
     <name>John</name>
-	<surname>Murphy</surname>
+    <surname>Murphy</surname>
 </config>
 ```
 
@@ -118,7 +118,7 @@ with the second file unchanged
 
 ```xml
 <config>
-	<name>Alex</name>
+    <name>Alex</name>
 </config>
 ```
 
