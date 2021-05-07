@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.atteo</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.18</version>
+		<version>1.19</version>
 	</parent>
 	<artifactId>xml-combiner</artifactId>
 	<version>1-SNAPSHOT</version>
@@ -29,6 +29,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+			<version>30.1.1-jre</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
