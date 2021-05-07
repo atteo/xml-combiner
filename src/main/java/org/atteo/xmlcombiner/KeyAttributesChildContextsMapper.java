@@ -1,28 +1,26 @@
 package org.atteo.xmlcombiner;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-
 public class KeyAttributesChildContextsMapper implements ChildContextsMapper {
 
 	@Override
-	public ListMultimap<Key, Context> mapChildContexts(Context parent,
+	public Map<Key, List<Context>> mapChildContexts(Context parent,
 			List<String> keyAttributeNames) {
 		List<Context> contexts = parent.groupChildContexts();
 
-		ListMultimap<Key, Context> map = LinkedListMultimap.create();
+		Map<Key, List<Context>> map = new LinkedHashMap<>();
 		for (Context context : contexts) {
 			Element contextElement = context.getElement();
 
 			if (contextElement != null) {
-				Map<String, String> keys = new HashMap<>();
+				Map<String, String> keys = new LinkedHashMap<>();
 				for (String keyAttributeName : keyAttributeNames) {
 					Attr keyNode = contextElement.getAttributeNode(keyAttributeName);
 					if (keyNode != null) {
@@ -36,9 +34,13 @@ public class KeyAttributesChildContextsMapper implements ChildContextsMapper {
 					}
 				}
 				Key key = new Key(contextElement.getTagName(), keys);
-				map.put(key, context);
+
+				List<Context> destinationContexts = map.computeIfAbsent(key, k -> new ArrayList<>());
+				destinationContexts.add(context);
+
 			} else {
-				map.put(Key.BEFORE_END, context);
+				List<Context> destinationContexts = map.computeIfAbsent(Key.BEFORE_END, k -> new ArrayList<>());
+				destinationContexts.add(context);
 			}
 		}
 		return map;

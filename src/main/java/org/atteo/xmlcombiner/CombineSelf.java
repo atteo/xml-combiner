@@ -269,7 +269,7 @@ public enum CombineSelf {
 	 * <pre>
 	 * {@code
 	 *  <config>
-	 *     <service id="id1" combine.self="OVERRIDABLE">
+	 *     <service id="id1" combine.self="OVERRIDABLE_BY_TAG">
 	 *         <test/>
 	 *     </service>
 	 *  </config>

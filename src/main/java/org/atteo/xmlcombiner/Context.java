@@ -99,6 +99,6 @@ class Context {
 
 	@Override
 	public String toString() {
-		return "[" + neighbours + ", " + element + "]";
+	    return neighbours + "" + element;
 	}
 }

@@ -21,9 +21,10 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -46,9 +47,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 /**
  * Combines two or more XML DOM trees.
@@ -139,14 +139,14 @@ public class XmlCombiner {
 	}
 
 	public XmlCombiner(DocumentBuilder documentBuilder) {
-		this(documentBuilder, Lists.<String>newArrayList());
+		this(documentBuilder, emptyList());
 	}
 
 	/**
 	 * Creates XML combiner using given attribute as an id.
 	 */
 	public XmlCombiner(String idAttributeName) throws ParserConfigurationException {
-		this(Lists.newArrayList(idAttributeName));
+		this(singletonList(idAttributeName));
 	}
 
 	public XmlCombiner(List<String> keyAttributeNames) throws ParserConfigurationException {
@@ -157,7 +157,7 @@ public class XmlCombiner {
 	 * Creates XML combiner using given document builder and an id attribute name.
 	 */
 	public XmlCombiner(DocumentBuilder documentBuilder, String keyAttributeNames) {
-		this(documentBuilder, Lists.newArrayList(keyAttributeNames));
+		this(documentBuilder, singletonList(keyAttributeNames));
 	}
 
 	public XmlCombiner(DocumentBuilder documentBuilder, List<String> keyAttributeNames) {
@@ -211,15 +211,20 @@ public class XmlCombiner {
 			document.removeChild(parent);
 		}
 		Context result = combine(Context.fromElement(parent), Context.fromElement(element));
-		result.addAsChildTo(document);
+		if (result != null) {
+			result.addAsChildTo(document);
+		}
 	}
 
 	/**
 	 * Return the result of the merging process.
 	 */
 	public Document buildDocument() {
-		filterOutDefaults(Context.fromElement(document.getDocumentElement()));
-		filterOutCombines(document.getDocumentElement());
+		Element element = document.getDocumentElement();
+		if (element != null) {
+			filterOutDefaults(Context.fromElement(element));
+			filterOutCombines(element);
+		}
 		return document;
 	}
 
@@ -295,75 +300,77 @@ public class XmlCombiner {
 		if (recessive.getElement() != null) {
 			Attr keysNode = recessive.getElement().getAttributeNode(Context.KEYS_ATTRIBUTE_NAME);
 			if (keysNode != null) {
-				keys = Splitter.on(",").splitToList(keysNode.getValue());
+				keys = Arrays.asList(keysNode.getValue().split(","));
 			}
 		}
 		if (dominant.getElement() != null) {
 			Attr keysNode = dominant.getElement().getAttributeNode(Context.KEYS_ATTRIBUTE_NAME);
 			if (keysNode != null) {
-				keys = Splitter.on(",").splitToList(keysNode.getValue());
+				keys = Arrays.asList(keysNode.getValue().split(","));
 			}
 		}
 
-		ListMultimap<Key, Context> recessiveContexts = childContextMapper.mapChildContexts(recessive, keys);
-		ListMultimap<Key, Context> dominantContexts = childContextMapper.mapChildContexts(dominant, keys);
+		Map<Key, List<Context>> recessiveContexts = childContextMapper.mapChildContexts(recessive, keys);
+		Map<Key, List<Context>> dominantContexts = childContextMapper.mapChildContexts(dominant, keys);
 
 		Set<String> tagNamesInDominant = getTagNames(dominantContexts);
 
 		// Execute only if there is at least one subelement in recessive
 		if (!recessiveContexts.isEmpty()) {
-			for (Entry<Key, Context> entry : recessiveContexts.entries()) {
-				Key key = entry.getKey();
-				Context recessiveContext = entry.getValue();
+			for (Key key : recessiveContexts.keySet()) {
+				for (Context recessiveContext : recessiveContexts.getOrDefault(key, emptyList())) {
 
-				if (key == Key.BEFORE_END) {
-					continue;
-				}
+					if (key == Key.BEFORE_END) {
+						continue;
+					}
 
-				if (getCombineSelf(recessiveContext.getElement()) == CombineSelf.OVERRIDABLE_BY_TAG) {
-					if (!tagNamesInDominant.contains(key.getName())) {
+					if (getCombineSelf(recessiveContext.getElement()) == CombineSelf.OVERRIDABLE_BY_TAG) {
+						if (!tagNamesInDominant.contains(key.getName())) {
+							recessiveContext.addAsChildTo(resultElement);
+							filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
+						}
+						continue;
+					}
+
+					if (dominantContexts.getOrDefault(key, emptyList()).size() == 1
+						&& recessiveContexts.getOrDefault(key, emptyList()).size() == 1) {
+
+						Context dominantContext = dominantContexts.get(key).iterator().next();
+
+						Context combined = combine(recessiveContext, dominantContext);
+						if (combined != null) {
+							combined.addAsChildTo(resultElement);
+						}
+					} else {
 						recessiveContext.addAsChildTo(resultElement);
-						filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
-					}
-					continue;
-				}
-
-				if (dominantContexts.get(key).size() == 1 && recessiveContexts.get(key).size() == 1) {
-					Context dominantContext = dominantContexts.get(key).iterator().next();
-
-					Context combined = combine(recessiveContext, dominantContext);
-					if (combined != null) {
-						combined.addAsChildTo(resultElement);
-					}
-				} else {
-					recessiveContext.addAsChildTo(resultElement);
-					if (recessiveContext.getElement() != null) {
-						filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
+						if (recessiveContext.getElement() != null) {
+							filter.postProcess(recessiveContext.getElement(), null, recessiveContext.getElement());
+						}
 					}
 				}
 			}
 		}
 
-		for (Entry<Key, Context> entry : dominantContexts.entries()) {
-			Key key = entry.getKey();
-			Context dominantContext = entry.getValue();
+		for (Key key : dominantContexts.keySet()) {
+			for (Context dominantContext : dominantContexts.get(key)) {
 
-			if (key == Key.BEFORE_END) {
-				dominantContext.addAsChildTo(resultElement, document);
-				if (dominantContext.getElement() != null) {
-					filter.postProcess(null, dominantContext.getElement(), dominantContext.getElement());
+				if (key == Key.BEFORE_END) {
+					dominantContext.addAsChildTo(resultElement, document);
+					if (dominantContext.getElement() != null) {
+						filter.postProcess(null, dominantContext.getElement(), dominantContext.getElement());
+					}
+					// break? this should be the last anyway...
+					continue;
 				}
-				// break? this should be the last anyway...
-				continue;
-			}
-			List<Context> associatedRecessives = recessiveContexts.get(key);
-			if (dominantContexts.get(key).size() == 1 && associatedRecessives.size() == 1
+				List<Context> associatedRecessives = recessiveContexts.getOrDefault(key, emptyList());
+				if (dominantContexts.getOrDefault(key, emptyList()).size() == 1 && associatedRecessives.size() == 1
 					&& getCombineSelf(associatedRecessives.get(0).getElement()) != CombineSelf.OVERRIDABLE_BY_TAG) {
-				// already added
-			} else {
-				Context combined = combine(Context.fromElement(null), dominantContext);
-				if (combined != null) {
-					combined.addAsChildTo(resultElement);
+					// already added
+				} else {
+					Context combined = combine(Context.fromElement(null), dominantContext);
+					if (combined != null) {
+						combined.addAsChildTo(resultElement);
+					}
 				}
 			}
 		}
@@ -532,9 +539,9 @@ public class XmlCombiner {
 		}
 	}
 
-	private static Set<String> getTagNames(ListMultimap<Key, Context> dominantContexts) {
+	private static Set<String> getTagNames(Map<Key, List<Context>> dominantContexts) {
 		Set<String> names = new HashSet<>();
-		for (Key key : dominantContexts.keys()) {
+		for (Key key : dominantContexts.keySet()) {
 			names.add(key.getName());
 		}
 

@@ -25,41 +25,39 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import org.custommonkey.xmlunit.Diff;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLIdentical;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLNotEqual;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+
+import static java.util.Collections.emptyList;
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class XmlCombinerTest {
 	@Test
 	public void identity() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+		TransformerException {
 		String content = "\n"
 				+ "<config>\n"
 				+ "    <service id='1'>\n"
 				+ "        <parameter>parameter</parameter>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(content, combineWithIdKey(content, content)), true);
+		assertThat(combineWithIdKey(content, content)).and(content).areSimilar();
 	}
 
 	@Test
 	public void mergeChildren() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1'>\n"
@@ -82,12 +80,12 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
 	public void appendChildren() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1' combine.children='append'>\n"
@@ -111,12 +109,12 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
 	public void commentPropagation() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <!-- Service 1 -->\n"
@@ -147,12 +145,12 @@ public class XmlCombinerTest {
 				+ "    </service>\n"
 				+ "    <!-- End of configuration file -->\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
 	public void attributes() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1' parameter='parameter' parameter2='parameter2'/>\n"
@@ -165,12 +163,12 @@ public class XmlCombinerTest {
 				+ "<config>\n"
 				+ "    <service id='1' parameter='other value' parameter2='parameter2' parameter3='parameter3'/>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
 	public void remove() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1'>\n"
@@ -189,12 +187,12 @@ public class XmlCombinerTest {
 				+ "    <service id='2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
 	public void override() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1'>\n"
@@ -216,7 +214,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -243,7 +241,7 @@ public class XmlCombinerTest {
 				+ "        <parameter3>parameter3</parameter3>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -272,7 +270,7 @@ public class XmlCombinerTest {
 				+ "        <parameter2>parameter2</parameter2>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -308,10 +306,10 @@ public class XmlCombinerTest {
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
-		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
-		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant3)), true);
-		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant, dominant3)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
+		assertThat(combineWithIdKey(recessive, dominant2)).and(dominant2).areSimilar();
+		assertThat(combineWithIdKey(recessive, dominant3)).and(result3).areSimilar();
+		assertThat(combineWithIdKey(recessive, dominant, dominant3)).and(result3).areSimilar();
 	}
 
 	@Test
@@ -341,14 +339,14 @@ public class XmlCombinerTest {
 				+ "    <service id='id2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
-		assertXMLIdentical(new Diff(dominant2, combineWithIdKey(recessive, dominant2)), true);
-		assertXMLIdentical(new Diff(dominant3, combineWithIdKey(recessive, dominant3)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
+		assertThat(combineWithIdKey(recessive, dominant2)).and(dominant2).areSimilar();
+		assertThat(combineWithIdKey(recessive, dominant3)).and(dominant3).areSimilar();
 	}
 
 	@Test
 	public void subnodes() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<outer>\n"
 				+ "  <inner>\n"
@@ -373,7 +371,7 @@ public class XmlCombinerTest {
 				+ "    content2\n"
 				+ "  </inner2>\n"
 				+ "</outer>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
 
 		String dominant2 = "\n"
 				+ "<outer combine.children='APPEND'>\n"
@@ -393,7 +391,7 @@ public class XmlCombinerTest {
 				+ "    content3\n"
 				+ "  </inner>\n"
 				+ "</outer>";
-		assertXMLIdentical(new Diff(result2, combineWithIdKey(recessive, dominant2)), true);
+		assertThat(combineWithIdKey(recessive, dominant2)).and(result2).areSimilar();
 
 		String dominant3 = "\n"
 				+ "<outer combine.self='override'>\n"
@@ -408,12 +406,12 @@ public class XmlCombinerTest {
 				+ "  </inner>\n"
 				+ "</outer>";
 
-		assertXMLIdentical(new Diff(result3, combineWithIdKey(recessive, dominant3)), true);
+		assertThat(combineWithIdKey(recessive, dominant3)).and(result3).areSimilar();
 	}
 
 	@Test
 	public void threeDocuments() throws SAXException, IOException, ParserConfigurationException,
-			TransformerConfigurationException, TransformerException {
+			TransformerException {
 		String recessive = "\n"
 				+ "<config>\n"
 				+ "    <service id='1' combine.self='DEFAULTS'>\n"
@@ -450,7 +448,7 @@ public class XmlCombinerTest {
 				+ "        <parameter2>parameter2</parameter2>\n"
 				+ "    </service>\n"
 				+ "</config>";
-		assertXMLIdentical(new Diff(result, combineWithIdKey(recessive, middle, dominant)), true);
+		assertThat(combineWithIdKey(recessive, middle, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -484,9 +482,9 @@ public class XmlCombinerTest {
 				+ "    </service>\n"
 				+ "</config>";
 
-		assertXMLNotEqual(result, combineWithIdKey(recessive, dominant));
-		assertXMLNotEqual(result, combineWithKey("n", recessive, dominant));
-		assertXMLIdentical(new Diff(result, combineWithKey("name", recessive, dominant)), true);
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areNotIdentical();
+		assertThat(combineWithKey("n", recessive, dominant)).and(result).areNotIdentical();
+		assertThat(combineWithKey("name", recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -508,9 +506,8 @@ public class XmlCombinerTest {
 				+ "        </service>\n"
 				+ "    </nested>\n"
 				+ "</config>";
-		String result = dominant;
 
-		assertXMLIdentical(new Diff(result, combineWithKey("name", recessive, dominant)), true);
+		assertThat(combineWithKey("name", recessive, dominant)).and(dominant).areSimilar();
 	}
 
 	@Test
@@ -553,8 +550,7 @@ public class XmlCombinerTest {
 				+ "    </nested>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithKeys(Lists.newArrayList("name", "id"),
-				recessive, dominant)), true);
+		assertThat(combineWithKeys(Lists.newArrayList("name", "id"), recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -604,7 +600,7 @@ public class XmlCombinerTest {
 				+ "    <service id='2'/>\n"
 				+ "</config>";
 
-		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
+		assertThat(combineWithKey("", recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -627,8 +623,7 @@ public class XmlCombinerTest {
 				+ "    <service name='d'/>\n"
 				+ "</config>";
 
-		//System.out.println(combineWithKey("", recessive, dominant));
-		assertXMLIdentical(new Diff(result, combineWithKey("", recessive, dominant)), true);
+		assertThat(combineWithKey("", recessive, dominant)).and(result).areSimilar();
 	}
 
 	@Test
@@ -651,28 +646,23 @@ public class XmlCombinerTest {
 				+ "    <service value='20' processed='true'/>\n"
 				+ "</config>";
 
-		XmlCombiner.Filter filter = new XmlCombiner.Filter() {
-			@Override
-			public void postProcess(Element recessive, Element dominant, Element result) {
-				result.setAttribute("processed", "true");
-				if (recessive == null || dominant == null) {
-					return;
-				}
-				Attr recessiveNode = recessive.getAttributeNode("value");
-				Attr dominantNode = dominant.getAttributeNode("value");
-				if (recessiveNode == null || dominantNode == null) {
-					return;
-				}
-
-				int recessiveValue = Integer.parseInt(recessiveNode.getValue());
-				int dominantValue = Integer.parseInt(dominantNode.getValue());
-
-				result.setAttribute("value", Integer.toString(recessiveValue + dominantValue));
+		XmlCombiner.Filter filter = (recessive1, dominant1, result1) -> {
+			result1.setAttribute("processed", "true");
+			if (recessive1 == null || dominant1 == null) {
+				return;
 			}
+			Attr recessiveNode = recessive1.getAttributeNode("value");
+			Attr dominantNode = dominant1.getAttributeNode("value");
+			if (recessiveNode == null || dominantNode == null) {
+				return;
+			}
+
+			int recessiveValue = Integer.parseInt(recessiveNode.getValue());
+			int dominantValue = Integer.parseInt(dominantNode.getValue());
+
+			result1.setAttribute("value", Integer.toString(recessiveValue + dominantValue));
 		};
-		//System.out.println(combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive, dominant));
-		assertXMLIdentical(new Diff(result, combineWithKeysAndFilter(Lists.<String>newArrayList(), filter, recessive,
-				dominant)), true);
+		assertThat(combineWithKeysAndFilter(emptyList(), filter, recessive, dominant)).and(result).areSimilar();
 	}
 
 
@@ -682,40 +672,46 @@ public class XmlCombinerTest {
 		// given
 		Path input = Paths.get("target/test.in");
 		Path output = Paths.get("target/test.out");
-		Files.write("<config/>", input.toFile(), StandardCharsets.UTF_8);
+
+		Files.asCharSink(input.toFile(), StandardCharsets.UTF_8).write("<config/>");
 
 		// when
 		XmlCombiner combiner = new XmlCombiner();
 		combiner.combine(input);
 		combiner.buildDocument(output);
-		List<String> lines = Files.readLines(output.toFile(), StandardCharsets.UTF_8);
+		List<String> lines = Files.asCharSource(output.toFile(), StandardCharsets.UTF_8).readLines();
 
 		// then
-		assertThat(lines).hasSize(1);
-		assertThat(lines.iterator().next()).contains("<config/>");
+		Assertions.assertThat(lines).hasSize(1);
+		Assertions.assertThat(lines.iterator().next()).contains("<config/>");
 	}
 
+	@Test
+	public void shouldRemoveRootElement() throws SAXException, IOException, ParserConfigurationException,
+		TransformerException {
+		String recessive = "<config/>";
+		String dominant = "<config combine.self=\"REMOVE\"/>";
+		String result = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
+		Assertions.assertThat(combineWithIdKey(recessive, dominant)).isEqualTo(result);
+	}
 	private static String combineWithIdKey(String... inputs) throws IOException,
-			ParserConfigurationException, SAXException, TransformerConfigurationException,
-			TransformerException {
+			ParserConfigurationException, SAXException, TransformerException {
 		return combineWithKey("id", inputs);
 	}
 
 	private static String combineWithKey(String keyAttributeName, String... inputs) throws IOException,
-			ParserConfigurationException, SAXException, TransformerConfigurationException,
-			TransformerException {
+			ParserConfigurationException, SAXException, TransformerException {
 		return combineWithKeys(Lists.newArrayList(keyAttributeName), inputs);
 	}
 
 	private static String combineWithKeys(List<String> keyAttributeNames, String... inputs) throws IOException,
-			ParserConfigurationException, SAXException, TransformerConfigurationException,
-			TransformerException {
+			ParserConfigurationException, SAXException, TransformerException {
 		XmlCombiner combiner = new XmlCombiner(keyAttributeNames);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 
 		for (String input : inputs) {
-			Document document = builder.parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+			Document document = builder.parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 			combiner.combine(document);
 		}
 		Document result = combiner.buildDocument();
@@ -727,15 +723,14 @@ public class XmlCombinerTest {
 	}
 
 	private static String combineWithKeysAndFilter(List<String> keyAttributeNames, XmlCombiner.Filter filter,
-			String... inputs) throws IOException, ParserConfigurationException, SAXException,
-			TransformerConfigurationException, TransformerException {
+			String... inputs) throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		XmlCombiner combiner = new XmlCombiner(keyAttributeNames);
 		combiner.setFilter(filter);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 
 		for (String input : inputs) {
-			Document document = builder.parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+			Document document = builder.parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 			combiner.combine(document);
 		}
 		Document result = combiner.buildDocument();

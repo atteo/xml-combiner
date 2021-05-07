@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/atteo/xml-combiner.svg)](https://travis-ci.org/atteo/xml-combiner)
 [![Coverage Status](https://img.shields.io/coveralls/atteo/xml-combiner.svg)](https://coveralls.io/r/atteo/xml-combiner)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.atteo/xml-combiner/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.atteo/xml-combiner)
+[![Apache 2](http://img.shields.io/badge/license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Overview
 ========
