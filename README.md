@@ -72,7 +72,7 @@ Maven dependency is:
 <dependency>
     <groupId>org.atteo</groupId>
     <artifactId>xml-combiner</artifactId>
-    <version>2.2</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
