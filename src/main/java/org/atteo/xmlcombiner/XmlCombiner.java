@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -440,7 +439,7 @@ public class XmlCombiner {
 	 * @param source source element
 	 * @param destination destination element
 	 */
-	private void copyAttributes(@Nullable Element source, Element destination) {
+	private void copyAttributes(Element source, Element destination) {
 		if (source == null) {
 			return;
 		}
@@ -457,7 +456,7 @@ public class XmlCombiner {
 		}
 	}
 
-	private static CombineSelf getCombineSelf(@Nullable Element element) {
+	private static CombineSelf getCombineSelf(Element element) {
 		CombineSelf combine = null;
 		if (element == null) {
 			return null;
@@ -475,7 +474,7 @@ public class XmlCombiner {
 		return combine;
 	}
 
-	private static CombineChildren getCombineChildren(@Nullable Element element) {
+	private static CombineChildren getCombineChildren(Element element) {
 		CombineChildren combine = null;
 		if (element == null) {
 			return null;
