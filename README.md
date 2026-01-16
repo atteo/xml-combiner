@@ -133,6 +133,45 @@ results in
 </config>
 ```
 
+Another option is to use ['add'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#ADD) value for 'combine.children' attribute. When two matching elements have 'combine.children' set to 'add' (or at least one of them), both elements will appear in the final document without merging their content.
+
+For example, combining:
+
+```xml
+<config>
+    <service id='1' combine.children='ADD'>
+        <parameter>parameter</parameter>
+        <parameter2>parameter2</parameter2>
+    </service>
+</config>
+```
+
+with
+
+```xml
+<config>
+    <service id='1'>
+        <parameter>other value</parameter>
+        <parameter3>parameter3</parameter3>
+    </service>
+</config>
+```
+
+results in
+
+```xml
+<config>
+    <service id='1'>
+        <parameter>parameter</parameter>
+        <parameter2>parameter2</parameter2>
+    </service>
+    <service id='1'>
+        <parameter>other value</parameter>
+        <parameter3>parameter3</parameter3>
+    </service>
+</config>
+```
+
 In addition there is also ['combine.self'](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html) attribute which allows to control how the element itself is combined.
 Combining
 
@@ -163,7 +202,7 @@ Below you can find the table of all allowed values which link to their detailed 
 |-----------------|-------------|
 | [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#MERGE) (default) | [merge](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#MERGE) (default) |
 | [append](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#APPEND) | [defaults](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#DEFAULTS) |
-| | [overridable](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE) |
+| [add](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineChildren.html#ADD) | [overridable](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE) |
 | | [overridable_by_tag](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDABLE_BY_TAG) |
 | | [override](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#OVERRIDE) |
 | | [remove](https://oss.sonatype.org/service/local/repositories/releases/archive/org/atteo/xml-combiner/2.2/xml-combiner-2.2-javadoc.jar/!/org/atteo/xmlcombiner/CombineSelf.html#REMOVE) | 

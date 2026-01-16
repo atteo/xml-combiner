@@ -336,9 +336,27 @@ public class XmlCombiner {
 
 						Context dominantContext = dominantContexts.get(key).iterator().next();
 
-						Context combined = combine(recessiveContext, dominantContext);
-						if (combined != null) {
-							combined.addAsChildTo(resultElement);
+						CombineChildren recessiveCombineChildren = getCombineChildren(recessiveContext.getElement());
+						CombineChildren dominantCombineChildren = getCombineChildren(dominantContext.getElement());
+
+						if (recessiveCombineChildren == CombineChildren.ADD || dominantCombineChildren == CombineChildren.ADD) {
+							// Add both elements without merging
+							Context recessiveCopy = copyRecursively(recessiveContext);
+							recessiveCopy.addAsChildTo(resultElement);
+							if (recessiveCopy.getElement() != null) {
+								filter.postProcess(recessiveContext.getElement(), null, recessiveCopy.getElement());
+							}
+
+							Context dominantCopy = copyRecursively(dominantContext);
+							dominantCopy.addAsChildTo(resultElement);
+							if (dominantCopy.getElement() != null) {
+								filter.postProcess(null, dominantContext.getElement(), dominantCopy.getElement());
+							}
+						} else {
+							Context combined = combine(recessiveContext, dominantContext);
+							if (combined != null) {
+								combined.addAsChildTo(resultElement);
+							}
 						}
 					} else {
 						recessiveContext.addAsChildTo(resultElement);
