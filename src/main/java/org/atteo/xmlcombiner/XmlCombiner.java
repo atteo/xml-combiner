@@ -60,8 +60,8 @@ import org.xml.sax.SAXException;
  * Finally the paired elements are recursively combined. Any not paired elements are appended.
  * </p>
  * <p>
- * You can control merging behavior using {@link CombineSelf 'combine.self'}
- * and {@link CombineChildren 'combine.children'} attributes.
+ * You can control merging behavior using {@link CombineSelf} (`combine.self`)
+ * and {@link CombineChildren} (`combine.children`) attributes.
  * </p>
  * <p>
  * The merging algorithm was inspired by similar functionality in Plexus Utils.
@@ -94,6 +94,15 @@ public class XmlCombiner {
     private Filter filter = NULL_FILTER;
     private final ChildContextsMapper childContextMapper = new KeyAttributesChildContextsMapper();
 
+    /**
+     * CLI entry point that combines provided XML files and prints the result.
+     *
+     * @param args command-line arguments such as files and --key flags
+     * @throws ParserConfigurationException when the parser cannot be configured
+     * @throws SAXException when parsing any input document fails
+     * @throws IOException when reading the files fails
+     * @throws TransformerException when writing the merged XML fails
+     */
     public static void main(String[] args)
             throws ParserConfigurationException, SAXException, IOException, TransformerException {
         List<Path> files = new ArrayList<>();
@@ -136,36 +145,52 @@ public class XmlCombiner {
         this(DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
+    /**
+     * Creates XML combiner using the provided {@link DocumentBuilder}.
+     *
+     * @param documentBuilder parser used to create intermediate DOM nodes
+     */
     public XmlCombiner(DocumentBuilder documentBuilder) {
         this(documentBuilder, emptyList());
     }
 
     /**
-     * Creates XML combiner using given attribute as an id.
-     */
-    public XmlCombiner(String idAttributeName) throws ParserConfigurationException {
-        this(singletonList(idAttributeName));
-    }
-
-    public XmlCombiner(List<String> keyAttributeNames) throws ParserConfigurationException {
-        this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), keyAttributeNames);
-    }
-
-    /**
-     * Creates XML combiner using given document builder and an id attribute name.
+     * Creates XML combiner using the provided {@link DocumentBuilder} and single key attribute.
+     *
+     * @param documentBuilder parser used to create intermediate DOM nodes
+     * @param keyAttributeNames attribute name used as element key
      */
     public XmlCombiner(DocumentBuilder documentBuilder, String keyAttributeNames) {
         this(documentBuilder, singletonList(keyAttributeNames));
     }
 
+    /**
+     * Creates XML combiner using the provided {@link DocumentBuilder} and key attributes.
+     *
+     * @param documentBuilder parser used to create intermediate DOM nodes
+     * @param keyAttributeNames attribute names used as element keys
+     */
     public XmlCombiner(DocumentBuilder documentBuilder, List<String> keyAttributeNames) {
+
         this.documentBuilder = documentBuilder;
         document = documentBuilder.newDocument();
         this.defaultAttributeNames = keyAttributeNames;
     }
 
     /**
-     * Sets the filter.
+     * Creates XML combiner using given key attributes and the default parser.
+     *
+     * @param keyAttributeNames attribute names used as element keys
+     * @throws ParserConfigurationException when the default parser cannot be created
+     */
+    public XmlCombiner(List<String> keyAttributeNames) throws ParserConfigurationException {
+        this(DocumentBuilderFactory.newInstance().newDocumentBuilder(), keyAttributeNames);
+    }
+
+    /**
+     * Sets the optional filter that post-processes merged elements.
+     *
+     * @param filter post-processing filter (nullable)
      */
     public void setFilter(Filter filter) {
         if (filter == null) {
@@ -177,7 +202,10 @@ public class XmlCombiner {
 
     /**
      * Combine given file.
+     *
      * @param file file to combine
+     * @throws SAXException when parsing fails
+     * @throws IOException when reading fails
      */
     public void combine(Path file) throws SAXException, IOException {
         combine(documentBuilder.parse(file.toFile()));
@@ -185,7 +213,10 @@ public class XmlCombiner {
 
     /**
      * Combine given input stream.
+     *
      * @param stream input stream to combine
+     * @throws SAXException when parsing fails
+     * @throws IOException when reading fails
      */
     public void combine(InputStream stream) throws SAXException, IOException {
         combine(documentBuilder.parse(stream));
@@ -215,7 +246,9 @@ public class XmlCombiner {
     }
 
     /**
-     * Return the result of the merging process.
+     * Returns the merged document.
+     *
+     * @return merged DOM document
      */
     public Document buildDocument() {
         Element element = document.getDocumentElement();
@@ -227,7 +260,10 @@ public class XmlCombiner {
     }
 
     /**
-     * Stores the result of the merging process.
+     * Stores the result of the merging process to an output stream.
+     *
+     * @param out output stream to receive the merged XML
+     * @throws TransformerException when marshalling fails
      */
     public void buildDocument(OutputStream out) throws TransformerException {
         Document result = buildDocument();
@@ -240,7 +276,11 @@ public class XmlCombiner {
     }
 
     /**
-     * Stores the result of the merging process.
+     * Stores the result of the merging process to a file path.
+     *
+     * @param path destination file path
+     * @throws TransformerException when marshalling fails
+     * @throws FileNotFoundException when the file cannot be opened
      */
     public void buildDocument(Path path) throws TransformerException, FileNotFoundException {
         buildDocument(new FileOutputStream(path.toFile()));

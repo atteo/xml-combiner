@@ -22,11 +22,10 @@ public enum CombineChildren {
     /**
      * Merge subelements from both elements.
      *
-     * <p>
-     * This is the default.
-     * Those subelements which can be uniquely paired between two documents using the key (tag+selected attributes)
-     * will be merged, those that cannot be paired will be appended.<br/>
-     * Example:<br/>
+     * This is the default. Those subelements which can be uniquely paired between two documents using the key (tag+selected attributes)
+     * will be merged, those that cannot be paired will be appended.
+     *
+     * Example:
      * First:
      * <pre>
      * {@code
@@ -57,14 +56,12 @@ public enum CombineChildren {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     MERGE,
 
     /**
      * Always append child elements from both recessive and dominant elements.
      *
-     * <p>
      * Example:<br/>
      * First:
      * <pre>
@@ -90,22 +87,20 @@ public enum CombineChildren {
      * <pre>
      * {@code
      * <config>
-     *     <service id="1" combine.children="append">
-     *         <parameter>parameter</parameter>
-     *         <parameter>parameter</parameter>
+     *     <service id="1">
+     *         <parameter>other value</parameter>
+     *         <parameter2>parameter2</parameter2>
      *     </service>
-     *  </config>
+     * </config>
      * }
      * </pre>
-     * </p>
      */
     APPEND,
 
     /**
      * Add both matching elements to the result without merging them.
-     *
-     * <p>
      * When two elements match (have the same key), if at least one of them has combine.children="ADD",
+     *
      * both elements will be added to the final document without merging their content.
      * This is different from MERGE (which merges matching elements) and APPEND (which appends children).
      * <br/>
@@ -145,9 +140,10 @@ public enum CombineChildren {
      * </config>
      * }
      * </pre>
-     * </p>
+     *
      */
     ADD;
 
+    /** Attribute used to mark child merge behavior. */
     public static final String ATTRIBUTE_NAME = "combine.children";
 }

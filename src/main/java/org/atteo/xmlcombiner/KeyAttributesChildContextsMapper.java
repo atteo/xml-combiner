@@ -8,7 +8,15 @@ import java.util.Map;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+/**
+ * Default implementation that selects key attributes defined on each element.
+ */
 public class KeyAttributesChildContextsMapper implements ChildContextsMapper {
+
+    /**
+     * Creates a mapper that chooses key attributes from each element.
+     */
+    public KeyAttributesChildContextsMapper() {}
 
     @Override
     public Map<Key, List<Context>> mapChildContexts(Context parent, List<String> keyAttributeNames) {

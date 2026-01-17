@@ -19,12 +19,11 @@ package org.atteo.xmlcombiner;
 public enum CombineSelf {
     /**
      * Merge elements.
-     * <p>
+     *
      * Attributes from dominant element override those from recessive element.
      * Child elements are by default paired using their keys (tag name and selected attributes) and combined
-     * recursively. The exact behavior depends on {@link CombineChildren 'combine.children'} attribute value.
-     * </p>
-     * <p>
+     * recursively. The exact behavior depends on {@link CombineChildren} `combine.children` attribute value.
+     *
      *
      * Example:<br/>
      * First:
@@ -58,14 +57,21 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
+     * Result:
+     * <pre>
+     * {@code
+     * <config>
+     *     <service id="1" combine.self="REMOVE"/>
+     *  </config>
+     * }
+     * </pre>
      */
     MERGE,
 
     /**
      * Remove entire element with attributes and children.
      *
-     * <p>
+     *
      * Example:<br/>
      * First:
      * <pre>
@@ -92,18 +98,16 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     REMOVE,
 
     /**
      * Behaves exactly like {@link #MERGE} if paired element exists in any subsequent dominant document.
      * If paired element is not found in any dominant document behaves the same as {@link #REMOVE}
-     * <p>
+     *
      * This behavior is specifically designed to allow specifying default values which are used only
      * when given element exists in any subsequent document.
-     * </p>
-     * <p>
+     *
      * Example:<br/>
      * First:
      * <pre>
@@ -135,18 +139,15 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     DEFAULTS,
 
     /**
      * Override element.
-     * <p>
+     *
      * Completely ignores content from recessive document by overwriting it
      * with element from dominant document.
-     * </p>
      *
-     * <p>
      * Example:<br/>
      * First:
      * <pre>
@@ -178,20 +179,17 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     OVERRIDE,
 
     /**
      * Override element.
-     * <p>
+     *
      * Completely ignores content from recessive document by overwriting it
      * with element from dominant document.
-     * </p>
-     * <p>
+     *
      * The difference with {@link #OVERRIDE} is that OVERRIDABLE is specified on the tag in recessive document.
-     * </p>
-     * <p>
+     *
      * Example:<br/>
      * First:
      * <pre>
@@ -220,8 +218,7 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
-     * <p>
+     *
      * Example2:<br/>
      * First:
      * <pre>
@@ -249,21 +246,18 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     OVERRIDABLE,
 
     /**
      * Override element.
-     * <p>
+     *
      * Completely ignores content from recessive document by overwriting it
      * with element from dominant document.
-     * </p>
-     * <p>
+     *
      * The difference with {@link #OVERRIDABLE} is that with OVERRIDABLE_BY_TAG recessive element is ignored
      * even when the id is different.
-     * </p>
-     * <p>
+     *
      * Example:<br/>
      * First:
      * <pre>
@@ -291,9 +285,9 @@ public enum CombineSelf {
      *  </config>
      * }
      * </pre>
-     * </p>
      */
     OVERRIDABLE_BY_TAG;
 
+    /** Attribute used to mark self merge behavior. */
     public static final String ATTRIBUTE_NAME = "combine.self";
 }
