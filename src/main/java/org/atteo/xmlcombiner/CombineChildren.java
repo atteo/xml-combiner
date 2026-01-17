@@ -99,7 +99,55 @@ public enum CombineChildren {
 	 * </pre>
 	 * </p>
 	 */
-	APPEND;
+	APPEND,
+
+	/**
+	 * Add both matching elements to the result without merging them.
+	 *
+	 * <p>
+	 * When two elements match (have the same key), if at least one of them has combine.children="ADD",
+	 * both elements will be added to the final document without merging their content.
+	 * This is different from MERGE (which merges matching elements) and APPEND (which appends children).
+	 * <br/>
+	 * Example:<br/>
+	 * First:
+	 * <pre>
+	 * {@code
+	 * <config>
+	 *     <service id="1" combine.children="ADD">
+	 *         <parameter>parameter</parameter>
+	 *     </service>
+	 * </config>
+	 * }
+	 * </pre>
+	 * Second:
+	 * <pre>
+	 * {@code
+	 * <config>
+	 *     <service id="1">
+	 *         <parameter>other value</parameter>
+	 *         <parameter2>parameter2</parameter2>
+	 *     </service>
+	 * </config>
+	 * }
+	 * </pre>
+	 * Result:
+	 * <pre>
+	 * {@code
+	 * <config>
+	 *     <service id="1">
+	 *         <parameter>parameter</parameter>
+	 *     </service>
+	 *     <service id="1">
+	 *         <parameter>other value</parameter>
+	 *         <parameter2>parameter2</parameter2>
+	 *     </service>
+	 * </config>
+	 * }
+	 * </pre>
+	 * </p>
+	 */
+	ADD;
 
 	public static final String ATTRIBUTE_NAME = "combine.children";
 }

@@ -113,6 +113,94 @@ public class XmlCombinerTest {
 	}
 
 	@Test
+	public void addChildren() throws SAXException, IOException, ParserConfigurationException,
+			TransformerException {
+		// Test with ADD on recessive element
+		String recessive = "\n"
+				+ "<config>\n"
+				+ "    <service id='1' combine.children='ADD'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String dominant = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String result = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		assertThat(combineWithIdKey(recessive, dominant)).and(result).areSimilar();
+
+		// Test with ADD on dominant element
+		String recessive2 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String dominant2 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1' combine.children='ADD'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String result2 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		assertThat(combineWithIdKey(recessive2, dominant2)).and(result2).areSimilar();
+
+		// Test with ADD on both elements
+		String recessive3 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1' combine.children='ADD'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String dominant3 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1' combine.children='ADD'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		String result3 = "\n"
+				+ "<config>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>parameter</parameter>\n"
+				+ "        <parameter2>parameter2</parameter2>\n"
+				+ "    </service>\n"
+				+ "    <service id='1'>\n"
+				+ "        <parameter>other value</parameter>\n"
+				+ "        <parameter3>parameter3</parameter3>\n"
+				+ "    </service>\n"
+				+ "</config>";
+		assertThat(combineWithIdKey(recessive3, dominant3)).and(result3).areSimilar();
+	}
+
+	@Test
 	public void commentPropagation() throws SAXException, IOException, ParserConfigurationException,
 			TransformerException {
 		String recessive = "\n"
