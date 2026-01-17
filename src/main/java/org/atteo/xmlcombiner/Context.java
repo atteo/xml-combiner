@@ -28,77 +28,76 @@ import org.w3c.dom.NodeList;
  * DOM {@link Element} with any other non-element nodes which precede it.
  */
 class Context {
-	public static final String KEYS_ATTRIBUTE_NAME = "combine.keys";
-	public static final String ID_ATTRIBUTE_NAME = "combine.id";
-	private final List<Node> neighbours = new ArrayList<>();
-	private Element element;
+    public static final String KEYS_ATTRIBUTE_NAME = "combine.keys";
+    public static final String ID_ATTRIBUTE_NAME = "combine.id";
+    private final List<Node> neighbours = new ArrayList<>();
+    private Element element;
 
-	public Context() {
-	}
+    public Context() {}
 
-	public static Context fromElement(Element element) {
-		Context context = new Context();
-		context.setElement(element);
-		return context;
-	}
+    public static Context fromElement(Element element) {
+        Context context = new Context();
+        context.setElement(element);
+        return context;
+    }
 
-	public void addNeighbour(Node node) {
-		neighbours.add(node);
-	}
+    public void addNeighbour(Node node) {
+        neighbours.add(node);
+    }
 
-	public List<Node> getNeighbours() {
-		return neighbours;
-	}
+    public List<Node> getNeighbours() {
+        return neighbours;
+    }
 
-	public void setElement(Element element) {
-		this.element = element;
-	}
+    public void setElement(Element element) {
+        this.element = element;
+    }
 
-	public Element getElement() {
-		return element;
-	}
+    public Element getElement() {
+        return element;
+    }
 
-	public void addAsChildTo(Node node) {
-		for (Node neighbour : neighbours) {
-			node.appendChild(neighbour);
-		}
-		node.appendChild(element);
-	}
+    public void addAsChildTo(Node node) {
+        for (Node neighbour : neighbours) {
+            node.appendChild(neighbour);
+        }
+        node.appendChild(element);
+    }
 
-	public void addAsChildTo(Node node, Document document) {
-		for (Node neighbour : neighbours) {
-			node.appendChild(document.importNode(neighbour, true));
-		}
-		if (element != null) {
-			node.appendChild(document.importNode(element, true));
-		}
-	}
+    public void addAsChildTo(Node node, Document document) {
+        for (Node neighbour : neighbours) {
+            node.appendChild(document.importNode(neighbour, true));
+        }
+        if (element != null) {
+            node.appendChild(document.importNode(element, true));
+        }
+    }
 
-	public List<Context> groupChildContexts() {
-		if (element == null) {
-			return Collections.emptyList();
-		}
-		NodeList nodes = element.getChildNodes();
-		List<Context> contexts = new ArrayList<>(nodes.getLength());
+    public List<Context> groupChildContexts() {
+        if (element == null) {
+            return Collections.emptyList();
+        }
+        NodeList nodes = element.getChildNodes();
+        List<Context> contexts = new ArrayList<>(nodes.getLength());
 
-		Context context = new Context();
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
-			if (node instanceof Element) {
-				context.setElement((Element) node);
-				contexts.add(context);
-				context = new Context();
-			} else {
-				context.addNeighbour(node);
-			}
-		}
-		// add last with empty element
-		contexts.add(context);
-		return contexts;
-	}
+        Context context = new Context();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node instanceof Element) {
+                context.setElement((Element) node);
+                contexts.add(context);
+                context = new Context();
+            } else {
+                context.addNeighbour(node);
+            }
+        }
+        // add last with empty element
+        contexts.add(context);
+        return contexts;
+    }
 
-	@Override
-	public String toString() {
-	    return neighbours + "" + element;
-	}
+    @Override
+    public String toString() {
+        return neighbours + "" + element;
+    }
 }

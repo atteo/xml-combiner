@@ -5,6 +5,5 @@ import java.util.Map;
 
 public interface ChildContextsMapper {
 
-	Map<Key, List<Context>> mapChildContexts(Context parent, List<String> keyAttributeNames);
-
+    Map<Key, List<Context>> mapChildContexts(Context parent, List<String> keyAttributeNames);
 }

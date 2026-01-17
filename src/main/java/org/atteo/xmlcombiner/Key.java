@@ -21,60 +21,59 @@ import java.util.Map;
  * Element name and the value of it's 'id' attribute if exists.
  */
 class Key {
-	public static final Key BEFORE_END = new Key("", null);
-	private final String name;
-	private final Map<String, String> keys;
+    public static final Key BEFORE_END = new Key("", null);
+    private final String name;
+    private final Map<String, String> keys;
 
-	public Key(String name, Map<String, String> keys) {
-		this.name = name;
-		this.keys = keys;
-	}
+    public Key(String name, Map<String, String> keys) {
+        this.name = name;
+        this.keys = keys;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 1;
-		if (name != null) {
-			hash += name.hashCode();
-		}
-		if (keys != null) {
-			hash = hash * 37 + keys.hashCode();
-		}
-		return hash;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        if (name != null) {
+            hash += name.hashCode();
+        }
+        if (keys != null) {
+            hash = hash * 37 + keys.hashCode();
+        }
+        return hash;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Key other = (Key) obj;
-		if ((name == null) ? (other.getName() != null) : !name.equals(other.getName())) {
-			return false;
-		}
-		if ((keys == null) ? (other.getId() != null) : !keys.equals(other.getId())) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Key other = (Key) obj;
+        if ((name == null) ? (other.getName() != null) : !name.equals(other.getName())) {
+            return false;
+        }
+        if ((keys == null) ? (other.getId() != null) : !keys.equals(other.getId())) {
+            return false;
+        }
+        return true;
+    }
 
-	public Map<String, String> getId() {
-		return keys;
-	}
+    public Map<String, String> getId() {
+        return keys;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String toString() {
-		if (keys != null) {
-			return name + "#" + keys;
-		} else {
-			return name;
-		}
-	}
-
+    @Override
+    public String toString() {
+        if (keys != null) {
+            return name + "#" + keys;
+        } else {
+            return name;
+        }
+    }
 }
